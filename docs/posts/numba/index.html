@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="http://www.example.com">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  Accelerating Python functions with Numba - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://www.example.com/posts/numba/">
+    <meta property="og:image" content="http://www.example.com">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="http://www.example.com/posts/numba/">
+    <meta name="twitter:image" content="http://www.example.com">
+
+    <base href="http://www.example.com/posts/numba/">
+    <title>
+  Accelerating Python functions with Numba - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="http://www.example.com/posts/numba/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="http://www.example.com/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="http://www.example.com/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.96.0" />
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">Accelerating Python functions with Numba</h1>
+      <h2 class="date">December 19, 2019</h2>
+
+      
+    </header>
+
+    <p>In this post, I will provide a brief overview of <strong><a href="http://numba.pydata.org/">Numba</a>, an open-source just-in-time function compiler, which can speed up subsets of your Python code</strong> easily, and with minimal intervention. Unlike other popular JIT compilers (e.g. Cython, pypy) Numba simply requires the addition of a function decorator, with the premise of approaching the speed of C or Fortran. Your source code remains pure Python while Numba handles the compilation at runtime.</p>
+<h5 id="how-does-it-work">How does it work?</h5>
+<p>Numba works best on code that uses <strong>Numpy arrays and functions, as well as loops</strong>. It also supports many of the functions from the math module. A comprehensive list of compatible functions can be found <a href="http://numba.pydata.org/numba-doc/0.17.0/reference/pysupported.html">here</a>.</p>
+<p>The easiest way to use it is through a collection of decorators applied to functions that instruct Numba to compile them (examples later!). When a Numba decorated function is called, <strong>it is compiled to machine code just-in-time for execution</strong>. This enables the entire or subsets of your code to subsequently <strong>run at native machine code speed</strong>.</p>
+<p>Numba <strong>generates optimised machine code from Python using the industry-standard LLVM compiler library</strong> (instead of a custom-made compiler, which made Numba possible). It handles all of the details around optimising code and generating machine code. The compilation sequence is as follows [<a href="https://www.youtube.com/watch?v=-4tD8kNHdXs">source</a>]:</p>
+
+<div style="text-align: center;">
+<figure style="width:75%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/numba.png"  />
+    
+    
+    <figcaption>
+        <i>Figure 1: Numba compilation sequence</i>
+        
+    </figcaption>
+    
+</figure>
+</div>
+
+<h5 id="numba-compilation-sequence">Numba compilation sequence</h5>
+<p><strong>A key step in the compilation process, is the conversion of the Python function in consideration to Numba’s intermediary representation</strong>. This process involves <strong>swapping supported functions to implementations provided by Numba, that it can translate fast to machine code</strong>. Python objects are stripped from the provided and inferred data types and are translated into representations with no CPython dependencies. This is then converted into LLVM interpretable code and fed into LLVM’S JIT compiler to get machine code. The code is cached, so that the entire compilation process won’t be repeated next time the function is called.</p>
+<p>Numba also offers a range of options for parallelising your code for CPUs and GPUs, often with only minor code changes.</p>
+<h5 id="current-limitations">Current limitations</h5>
+<ul>
+<li>Numba <strong>compiles Python functions, not entire programs</strong> (pypy is great for that).  It also doesn’t support partial compilation of functions – it needs to be able to resolve all data types in the selected function.</li>
+<li>Presently, Numba is focused on numerical data types, like <em>int</em>, <em>float</em>, and <em>complex</em>. There is very <strong>limited string processing support</strong> and the best results are realised with Numpy arrays.</li>
+<li>Decorating functions that make use of Pandas (or other unsupported data structures) would deteriorate performance. <strong>Pandas is not understood by Numba</strong> and as a result, Numba would simply run this code via the interpreter but with the additional cost of the Numba internal overheads.</li>
+<li>You are better off using Cython for code that interferes with C++, as Numba can’t talk with C++ effectively unless a C wrapper is used.</li>
+<li><strong>Numba doesn’t generate C/C++ code that can be used for a separate compilation</strong>; it goes directly from Python down to LLVM code.  Cython would be more suitable for this use case,  as it allows inspection of the code in C++ before compilation.</li>
+</ul>
+<h5 id="a-few-examples">A few examples</h5>
+<p>Below are a few quick demonstrations of how Numba can accelerate your functions. More examples can be found <a href="http://numba.pydata.org/">here</a>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+</span></span></code></pre></div><p>load dummy dataset</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">digits</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_digits</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">digits</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+</span></span></code></pre></div><h6 id="example-1--numpy-function">Example 1 – numpy function</h6>
+<p>To enable Numba, simply add the decorator <em>@njit</em>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Y</span>
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">func</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span></code></pre></div><p>828 µs ± 20.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@njit</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">njit_func</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Y</span>
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">njit_func</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span></code></pre></div><p>710 µs ± 167 µs per loop (mean ± std. dev. of 7 runs, 1 loop each)</p>
+<h6 id="example-2--numpy-function-and-loop">Example 2 – numpy function and loop</h6>
+<p>Numba’s prange provides the ability to run loops in parallel, that are scheduled in separate threads (similar to Cython’s prange). Simply replace range with prange.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Y</span>
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">func</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span></code></pre></div><p>8.75 s ± 570 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@njit</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">njit_func</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Y</span>
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">njit_func</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span></code></pre></div><p>6.46 s ± 17.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</p>
+<h6 id="example-3--math-functions">Example 3 – math functions</h6>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hypotenuse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">t</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">hypotenuse</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">)</span>
+</span></span></code></pre></div><p>674 ns ± 12.2 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@njit</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">njit_hypotenuse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">t</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">%</span><span class="n">timeit</span> <span class="n">njit_hypotenuse</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">)</span>
+</span></span></code></pre></div><p>160 ns ± 1.61 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)</p>
+<h5 id="remarks">Remarks</h5>
+<ul>
+<li>
+<p>As mentioned, Numba can’t compile all Python code; <strong>certain functions don’t have a Numba translation, and some data structures can’t be effectively compiled yet (e.g. Pandas)</strong>. When this occurs Numba falls back into a mode,  called “object mode”, which doesn’t do type inference. Unfortunately Numba does not inform the user when this happens.</p>
+</li>
+<li>
+<p>In the Numba world, you will also come across the jit decorator. It serves the same purpose as the njit operator, with only different being that jit is falling back to object mode by default, without providing any error warnings if type inference fails. On the other hand, <em>njit</em> would raise a warning and break the code. You may also come across its alias, <em>@jit(nopython=True)</em>. Let’s see an example.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span> <span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;even&#39;</span><span class="p">,</span> <span class="s1">&#39;odd&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="nd">@jit</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">bad_example</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;even&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">bad_example</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</span></span></code></pre></div><p>0    2<br>
+1    1<br>
+Name: even, dtype: int64</p>
+<p>Although with <em>@jit</em> the code runs successfully, <em>@njit</em> raises an error.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@njit</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">bad_example</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;even&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">bad_example</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</span></span></code></pre></div><p>TypingError                               Traceback (most recent call last)
+<!-- raw HTML omitted --> in <!-- raw HTML omitted -->()
+3     return x[&rsquo;even&rsquo;]
+4
+&mdash;-&gt; 5 bad_example(df)
+6
+7 bad_example(df)</p>
+<p>~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in _compile_for_args(self, *args, **kws)
+399                 e.patch_message(msg)
+400
+&ndash;&gt; 401             error_rewrite(e, &rsquo;typing&rsquo;)
+402         except errors.UnsupportedError as e:
+403             # Something unsupported is present in the user code, add help info</p>
+<p>~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in error_rewrite(e, issue_type)
+342                 raise e
+343             else:
+&ndash;&gt; 344                 reraise(type(e), e, None)
+345
+346         argtypes = []</p>
+<p>~/anaconda3/lib/python3.6/site-packages/numba/six.py in reraise(tp, value, tb)
+666             value = tp()
+667         if value.<strong>traceback</strong> is not tb:
+&ndash;&gt; 668             raise value.with_traceback(tb)
+669         raise value
+670</p>
+<p>TypingError: Failed in nopython mode pipeline (step: nopython frontend)
+non-precise type pyobject
+[1] During: typing of argument at <!-- raw HTML omitted --> (3)</p>
+<p>File &ldquo;<!-- raw HTML omitted -->&rdquo;, line 3:
+def bad_example(x):
+return x[&rsquo;even&rsquo;]
+^</p>
+<p>This error may have been caused by the following argument(s):<br>
+-argument 0: cannot determine Numba type of &lt;class &lsquo;pandas.core.frame.DataFrame&rsquo;&gt;</p>
+<hr>
+<p>Usually this is not a problem with Numba itself but instead <strong>often caused by the use of unsupported features or an issue in resolving types</strong>. Python/ NumPy features supported by the latest release can be found <a href="http://numba.pydata.org/numba-doc/latest/reference/pysupported.html">here</a> and <a href="http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html">here</a>. More information on typing errors and how to debug them can be found <a href="http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-doesn-t-compile">here</a>.</p>
+<p>Numba is under active development with lots of exciting functionality in store (e.g. class wrappers). To help its development, consider reporting any new issues at <a href="https://github.com/numba/numba/issues/new">Numba&rsquo;s GitHub repo</a>.</p>
+</li>
+</ul>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2021    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div>
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

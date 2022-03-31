@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Christina Kouridi</title>
+    <link>http://www.example.com/posts/</link>
+    <description>Recent content in Posts on Christina Kouridi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://www.example.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reinforcement Learning papers at NeurIPS 2021</title>
+      <link>http://www.example.com/posts/rl-neurips-2021/</link>
+      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/rl-neurips-2021/</guid>
+      <description>Notes on Reinforcement Learning papers at NeurIPS 2021.
+1. Automatic Data Augmentation for Generalisation in Reinforcement Learning [arXiv, GitHub] TL;DR
+Proposes a theoretically motivated way of using data augmentation with actor-critic algorithms, and a practical approach for automatically selecting an effective augmentation to improve generalisation in RL.
+Motivation
+Recent works have shown data augmentation to be an effective technique for improving sample efficiency and generalisation in RL. However, the authors cast past applications of data augmentation to RL theoretically unsound due to inaccurate importance sampling estimates.</description>
+    </item>
+    
+    <item>
+      <title>My machine learning research toolkit</title>
+      <link>http://www.example.com/posts/ml-research-toolkit/</link>
+      <pubDate>Sat, 31 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/ml-research-toolkit/</guid>
+      <description>In this post, I will share the key tools in my machine learning research workflow. My selection criteria included free accessibility to students, ease of adoption, active development, and quality of features.
+1. Terminal session organiser - [Tmux] Tmux is a terminal multiplexer; it facilitates running and organising sessions on the terminal. Specifically, it enables alternating between several sessions in one terminal, and restoring their state after detachment (i.e. closing the terminal window does not terminate them).</description>
+    </item>
+    
+    <item>
+      <title>&#39;Certifying Some Distributional Robustness with Principled Adversarial Training&#39;</title>
+      <link>http://www.example.com/posts/paper-notes-wrm/</link>
+      <pubDate>Tue, 27 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/paper-notes-wrm/</guid>
+      <description>In this post I will provide a brief overview of the paper “Certifying Some Distributional Robustness with Principled Adversarial Training”. It assumes good knowledge of stochastic optimisation and adversarial robustness. This work is a positive step towards training neural networks that are robust to small perturbations of their inputs, which may stem from adversarial attacks.
+A PyTorch implementation of the main algorithm can be found in my GitHub repo.
+Contributions This work makes two key contributions:</description>
+    </item>
+    
+    <item>
+      <title>A brief summary of challenges in Multi-agent RL</title>
+      <link>http://www.example.com/posts/marl-challenges/</link>
+      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/marl-challenges/</guid>
+      <description>Deep reinforcement learning (DRL) algorithms have shown significant success in recent years, surpassing human performance in domains ranging from Atari, Go and no-limit poker [1]. The resemblance of its underlying mechanics to human learning, promises even greater results in real-life applications.
+Given that many real-world problems involve environments with a large number of learning agents, a natural extension to DRL is Multi-Agent Deep Reinforcement Learning (MDRL). This field of study is concerned with developing Deep Reinforcement Learning techniques and algorithms that enable a set of autonomous agents to make successful decisions in a shared environment.</description>
+    </item>
+    
+    <item>
+      <title>Accelerating Python functions with Numba</title>
+      <link>http://www.example.com/posts/numba/</link>
+      <pubDate>Thu, 19 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/numba/</guid>
+      <description>In this post, I will provide a brief overview of Numba, an open-source just-in-time function compiler, which can speed up subsets of your Python code easily, and with minimal intervention. Unlike other popular JIT compilers (e.g. Cython, pypy) Numba simply requires the addition of a function decorator, with the premise of approaching the speed of C or Fortran. Your source code remains pure Python while Numba handles the compilation at runtime.</description>
+    </item>
+    
+    <item>
+      <title>Vanilla GAN with Numpy</title>
+      <link>http://www.example.com/posts/numpy-gan/</link>
+      <pubDate>Tue, 09 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/numpy-gan/</guid>
+      <description>Generative Adversarial Networks (GANs) have achieved tremendous success in generating high-quality synthetic images and efficiently internalising the essence of the images that they learn from. Their potential is enormous, as they can learn to do that for any distribution of data.
+In order to keep up with the latest advancements, I decided to explore their theoretical underpinnings by implementing a simple GAN in Python using Numpy. In this post, I will go through the implementation steps based on Ian Goodfellow’s Generative Adversarial Nets paper.</description>
+    </item>
+    
+    <item>
+      <title>Implementing a LSTM from scratch with Numpy</title>
+      <link>http://www.example.com/posts/implement-lstm/</link>
+      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/implement-lstm/</guid>
+      <description>In this post, we will implement a simple character-level LSTM using Numpy. It is trained in batches with the Adam optimiser and learns basic words after just a few training iterations.
+The full code is available on this GitHub repo.
+ Figure 1: Architecture of a LSTM memory cell    Imports import numpy as np import matplotlib.pyplot as plt Data preparation Our dataset is J.K. Rowling’s Harry Potter and the Philosopher’s Stone.</description>
+    </item>
+    
+    <item>
+      <title>Deriving backpropagation equations for an LSTM</title>
+      <link>http://www.example.com/posts/backprop-lstm/</link>
+      <pubDate>Wed, 19 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/backprop-lstm/</guid>
+      <description>In this post I will derive the backpropagation equations for a LSTM cell in vectorised form. It assumes basic knowledge of LSTMs and backpropagation, which you can refresh at Understanding LSTM Networks and A Quick Introduction to Backpropagation.
+Derivations Forward propagation We will firstly remind ouselves of the forward propagation equations. The nomenclature followed is demonstrated in Figure 1. All equations correspond to one time step.
+ Figure 1: Architecture of a LSTM memory cell at timestep t    $\begin{aligned} &amp;amp;h_{t-1} \in \mathbb{R}^{n_{h}}, &amp;amp; \mspace{31mu} x_{t} \in \mathbb{R}^{n_{x}} \\ &amp;amp;z_{t}= [h_{t-1}, x_{t}] \\ \end{aligned}$</description>
+    </item>
+    
+    <item>
+      <title>A beginner’s guide to running Jupyter Notebook on Amazon EC2</title>
+      <link>http://www.example.com/posts/aws/</link>
+      <pubDate>Mon, 03 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.example.com/posts/aws/</guid>
+      <description>As a beginner in large-scale data manipulation, I quickly found the computational needs of my projects exceeding the capabilities of my personal equipment. I have therefore found Amazon’s EC2 offering very convenient &amp;ndash; renting virtual computers on which computer applications can be run remotely from a local machine, and for free.
+In this post, I detail the process that I have followed to set up an EC2 instance.
+Overview:  Create an AWS account Launch an EC2 instance via the EC2 dashboard Connect to your EC2 instance using SSH Install Anaconda to your EC2 instance Configure Jupyter Notebook Connect to Jupyter Notebook from your local machine Stop your EC2 instance  Step 1: Create an AWS account  Create an AWS account here.</description>
+    </item>
+    
+  </channel>
+</rss>

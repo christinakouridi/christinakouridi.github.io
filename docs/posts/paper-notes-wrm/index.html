@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="http://www.example.com">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  &#39;Certifying Some Distributional Robustness with Principled Adversarial Training&#39; - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://www.example.com/posts/paper-notes-wrm/">
+    <meta property="og:image" content="http://www.example.com">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="http://www.example.com/posts/paper-notes-wrm/">
+    <meta name="twitter:image" content="http://www.example.com">
+
+    <base href="http://www.example.com/posts/paper-notes-wrm/">
+    <title>
+  &#39;Certifying Some Distributional Robustness with Principled Adversarial Training&#39; - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="http://www.example.com/posts/paper-notes-wrm/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="http://www.example.com/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="http://www.example.com/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.96.0" />
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">&#39;Certifying Some Distributional Robustness with Principled Adversarial Training&#39;</h1>
+      <h2 class="date">October 27, 2020</h2>
+
+      
+        <script type="text/javascript" async
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML-full">
+          MathJax.Hub.Config({
+            tex2jax: {
+              inlineMath: [['$','$']],
+              displayMath: [['$$','$$']],
+              processEscapes: true,
+              processEnvironments: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+              TeX: { extensions: ["AMSmath.js", "AMSsymbols.js", "AMSfonts.js"] }
+            }
+          });
+          MathJax.Hub.Queue(function() {
+            
+            
+            
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i = 0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+          });
+          </script>
+      
+    </header>
+
+    <p>In this post I will provide a brief overview of the paper <strong><a href="https://arxiv.org/pdf/1710.10571.pdf">“Certifying Some Distributional Robustness with Principled Adversarial Training”</a></strong>. It assumes good knowledge of <a href="https://www.youtube.com/watch?v=0MeNygohD6c">stochastic optimisation</a> and <a href="https://adversarial-ml-tutorial.org/">adversarial robustness</a>. This work is a positive step towards training neural networks that are robust to small perturbations of their inputs, which may stem from adversarial attacks.</p>
+<p>A PyTorch implementation of the main algorithm can be found in <a href="https://github.com/christinakouridi/arks/blob/master/src/main/methods.py#L166">my GitHub repo</a>.</p>
+<h5 id="contributions">Contributions</h5>
+<p>This work makes two key contributions:</p>
+<ol>
+<li><strong>Proposes an adversarial procedure to train distributionally robust neural network models</strong>, which is otherwise intractable. This involves augmenting parameter updates with worst-case adversarial distributions within a certain <a href="https://en.wikipedia.org/wiki/Wasserstein_metric">Wasserstein distance</a> from a nominal distribution created from the training data</li>
+<li><strong>For smooth losses and medium levels of required robustness, the training procedure has theoretical guarantees on its computational and statistical performance</strong>; for higher adversarial robustness, it can be used as a heuristic approach. Its major advantages are then simplicity and applicability across many models and machine learning paradigms (e.g. supervised and reinforcement learning).</li>
+</ol>
+<h5 id="adversarial-training-procedure">Adversarial training procedure</h5>
+<p>In stochastic optimisation, the aim is to minimise an expected loss: $\mathbf{E}_{P_0} \left[ \ell(\theta; Z) \right]$ over a parameter $\theta \in \Theta$, for a training distirbution $Z \sim P_0$. In distributionally robust optimisation, the aim is to minimise the following:</p>
+<p>$\begin{aligned}
+(1) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \hspace{0.1cm} \underset{P \in \mathcal{P}}{\text{sup }} \hspace{0.1cm} \mathbf{E}_{P}[\ell(\theta ; Z)]
+\end{aligned}$</p>
+<p>where $\mathcal{P}$ is a postulated class of distributions around the data-generating distribution $P_0$. $\mathcal{P}$ influences robustness guarantees and computability. <strong>This work considers the robustness region defined by Wassertedin-based uncertainty sets</strong> $\mathcal{P} = \{ P: W_c(P, P_0) \leq \rho \}$, where $\rho$ defines the neighborhood around $P_0$, and $c$ is the “cost” for an adversary to perturbe $z_0$ to $z$ (the authors typically use $c(z, z_0) = || z - z_0||_{p}^{2}$ with $p \geq 1$ and set $p=2$ in their experiments).</p>
+<p><strong>As solving the min-max problem (1) is analytically intractable for deep learning and other complex models for arbitrary $\rho$, the authors reformulate it using a Lagrangian relaxation with a fixed penalty paramter $\gamma \geq 0$</strong>:</p>
+<p>$\begin{aligned}
+(2a) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }}  \{{ F(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} { \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W_{c}\left(P, P_{0}\right)}=\mathbf{E}_{P}[\phi_{\gamma}(\theta ; Z)]} \}
+\end{aligned}$</p>
+<p>$\begin{aligned}
+(2b) \hspace{0.8cm}  \phi_{\gamma}\left(\theta ; z_{0}\right):=\underset{z \in \mathcal{Z}}{\text{sup}} \hspace{0.3cm} {\ell(\theta;z) - \gamma c(z,z_0)}
+\end{aligned}$</p>
+<p>the usual loss $\ell$ has been replaced by the robust surrogate $\phi_\gamma$, which allows for adversarial perturbations z, modulated by the penalty $\gamma$. As $P_0$ is unknown, the penalty problem (2) is solved with the empirical distribution $\hat{P}_n$:</p>
+<p>$\begin{aligned}
+(3) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \{ { F_{n}(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} { \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W_{c}(P, \hat{P}_{n})}=\mathbf{E}_{\hat{P}_{n}}[\phi_{\gamma}(\theta ; Z)]} \}
+\end{aligned}$</p>
+<p>As we will discuss later on, <strong>the reformulated objective ensures that moderate levels of robustness against adversarial perturbations are achievable at no computational or statistical cost for smooth losses $\ell$</strong>. This utilises the key insight that <strong>for large enough penalty $\gamma$ (by duality, small enough robustness $\rho$), the robust surrogate function $\phi_\gamma = \ell(\theta;z) - \gamma c(z, z_0)$ in (2b) is strongly concave and hence easy to optimise if $\ell(\theta;z)$ is smooth in $z$</strong>. This implies that stochastic gradient methods applied to (2) have similar convergence guarantees as for non-robust methods.</p>
+<p>By inspection, we can obtain that for <strong>large $\gamma$, the term $-\gamma c(z, z_0)$ dominates. If $c(z, z_0)$ is designed to be strongly convex, then $-c(z, z_0)$ and $\phi_{\gamma}$ would be strongly concave</strong>. More formally, this key insight relies on the assumptions that the cost $c$ is <em>1-strong concave</em> and that the loss $\ell(\theta; \dot)$ is smooth such that there is some $L$ for which $\nabla_{z} \ell(\theta; \dot)$ is <em>L-Lipschitz</em>. The former gives a bound for <em>c</em>, and the latter along with a taylor series expansion of $\ell(\theta; z&rsquo;)$ around $z’=z$, a bound for $L$. Combining them results in:</p>
+<p>$\begin{aligned}
+(4) \hspace{0.8cm} \ell\left(\theta ; z^{\prime}\right)-\gamma c\left(z^{\prime}, z_{0}\right) \leq \ \ell(\theta ; z)-\gamma c\left(z, z_{0}\right)+\left\langle\nabla_{z}\left(\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\right), z^{\prime}-z\right\rangle+\frac{L-\gamma}{2}\left|z-z^{\prime}\right|_{2}^{2}
+\end{aligned}$</p>
+<p>The last term makes use of the property $| \nabla_z \ell | \leq L$, and that $c$ is twice differentiable. For $\gamma \geq L$ i.e. (negative $L - \gamma$), (4) gives us the first-order condition for ($\gamma  - L$)-strong concativity of $z \rightarrow (\ell(\theta; \dot) - \gamma c(z, z_0))$. To reiterate, <strong>when the loss is smooth enough in $z$ and the penalty $\gamma$ is large enough (corresponding to less robustness), computing the surrogate (2b) is a strongly-concave optimisation problem</strong>.</p>
+<h5 id="computational-guarantees">Computational guarantees</h5>
+<p><strong>Formulation (4) relaxes the requirement for a prescribed amount of robustness $\rho$, and instead focuses on the Lagrangian penalty formulation (3)</strong>. The authors develop a stochastic gradient descent (SGD) procedure to optimise it, motivated by the observation:</p>
+<p>$\begin{aligned}
+(5a) \hspace{0.8cm} \nabla_{\theta} \phi_{\gamma}\left(\theta ; z_{0}\right)=\nabla_{\theta} \ell\left(\theta ; z^{\star}\left(z_{0}, \theta\right)\right) \hspace{0.2cm}
+\end{aligned}$</p>
+<p>$\begin{aligned}
+(5b) \hspace{0.8cm} z^{\star}\left(z_{0}, \theta\right)=\underset{z \in \mathcal{Z}}{\text{argmax }} \{\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\}
+\end{aligned}$</p>
+<p>which is met under two assumptions:</p>
+<ul>
+<li><strong>the cost function $c(z, z_0)$ is continuous and l-strongly convex</strong> (e.g. $|| z - z_0||^{2}_{2}$)</li>
+<li><strong>the loss</strong> $\ell : \Theta \times Z \rightarrow \mathbb{R}_+$ <strong>satisfies certain Lipschitzian smoothness conditions</strong></li>
+</ul>
+<p>The resulting SGD procedure is demonstrated by Algorithm 1:</p>
+
+<div style="text-align: center;">
+<figure style="width:60%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/blog_wrm_1.png"  />
+    
+    
+</figure>
+</div>
+
+<p>The convergence properties of this algorithm depends on the loss:</p>
+<ul>
+<li>when $\ell$ is convex in $\theta$ and $\gamma$ is large enough (not too much robustness) so that $\phi_\gamma$ is concave for all $(\theta, z_0) \in \theta \times Z$, algorithm 1 is efficiently solvable with convergence rate $\dfrac{1}{\sqrt{T}}$</li>
+<li>when the loss $\ell$ is non-convex in $\theta$, the SGD method can convergence to a stationary point at the same rate as standard smooth non-convex optimisation when $\gamma \geq L_{zz}$ (as shown by theorem 2 in the paper). This theorem also suggests that approximate maximisation of the surrogate objective has limited effects.</li>
+</ul>
+<p><strong>If the loss is not smooth in z, the inner supremum (2b) is NP-hard to compute for non-smooth deep networks</strong>. In practice, distributionally robust optimisation <strong>can easily become tractable for deep learning by replacing ReLUs with sigmoids, ELUs or other smooth activations</strong>.</p>
+<h5 id="certificate-of-robustness-and-generalisation">Certificate of robustness and generalisation</h5>
+<p><em>Algorithm 1</em> provably learns to protect against adversarial perturbations of the form (3) on the training set. The authors also show that such procedures generalize, allowing to prevent attacks on the test set. They are two key results in the corresponding section:</p>
+<ol>
+<li>
+<p>an efficiently computable upper bound on the level of robustness for the worst-case population objective $\text{sup}_{P: W_{c} ( P, P_{0} ) \leq \rho} \mathbb{E}_{P}[\ell(\theta ; Z)]$ for any arbitrary level of robustness $\rho$. This is optimal for $\rho = \hat{\rho}_n$, the level of robustness achieved for the empirical distribution by solving (3) (this gives parameters $\theta_{WRM})$.</p>
+<p>$\begin{aligned}
+(6) \hspace{0.8cm} \underset{P: W_{c} \left(P, P_{0}\right) \leq \rho}{\text{sup}} \mathbb{E}_P [\ell(\theta; Z)] \leq \gamma \rho + \mathbb{E}_{\hat{P}_{n}} [\phi_{\gamma}(\theta ; Z)]+\epsilon_{n}(t)
+\end{aligned}$</p>
+</li>
+<li>
+<p>the adversarial perturbations on the training set generalize: solving the empirical penalty problem (3) guarantees a similar level of robustness as directly solving its population counterpart (2).</p>
+</li>
+</ol>
+<h5 id="bounds-on-smoothness-of-neural-networks">Bounds on smoothness of neural networks</h5>
+<p>Since the above guarantees only apply for a loss $x \rightarrow \ell(\theta; (x, y))$ that satisfies $\gamma \geq L_{xx}$, the authors provide conservative upper bounds on the Lipschitz constant $L_{xx}$ of the loss. However, <strong>due to the conservative natural of the bound, choosing $\gamma$ larger than this value — so that the aforementioned theoretical results apply – may not yield to appreciable robustness in practice</strong>.</p>
+<h5 id="visualising-the-benefits-of-certified-robustness">Visualising the benefits of certified robustness</h5>
+<p>To demonstrate the certified robustness of their WRM approach (short for Wasserstein Risk Minimisation), the authors devise a simple supervise learning task. The underlying model is a small neural network with either all ReLU or ELU activations between layers. It is benchmarked against two common baseline models: ERM (short for Empirical Risk Minimisation) and FGM (Fast Gradient Minimisation).</p>
+
+<div style="text-align: center;">
+<figure style="width:70%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/blog_wrm_2.png"  />
+    
+    
+</figure>
+</div>
+
+<p>Figure 1 shows the classification boundary learnt by each training procedure (separates blue from orange samples). For both activations, <strong>WRM pushes the classification boundaries further outwards than ERM and FGM; intuitively, adversarial examples come from pushing blue points outwards across the boundary</strong>. Additionally, it seems to be less affected by sensitivities in the data than ERM and FGM, <strong>as evident by its more symmetrical shape</strong>. WRM with ELU in particular, yields an axisymmetric classification boundary that hedges against adversarial perturbations in all directions. This demonstrates the certified level of robustness proven in this work.</p>
+<p>The authors also demonstrate the certificate of robustness on the worst-case performance for various levels of robustness $\rho$ for the same toy dataset, as well as MNIST:</p>
+
+<div style="text-align: center;">
+<figure style="width:70%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/blog_wrm_3.png"  />
+    
+    
+</figure>
+</div>
+
+<!-- raw HTML omitted -->
+<h5 id="limitations">Limitations</h5>
+<ul>
+<li><strong>The adversarial training procedure is only tractable for smooth losses</strong> (i.e. the gradient of the loss must not change abruptly). Specifically, for the inner supremum in (3) to be strongly concave, the Lagrangian penalty parameter must satisfy $\gamma \geq L$. $L$ is a problem-dependent smoothness parameter, which is most often unknown and hard to approximate.</li>
+<li><strong>Convergence for non-convex SGD only applies for small values of robustness $\rho$ and to a limited set of Wasserstein costs</strong>. In practice methods do not outperform baseline models for large adversarial attacks either.</li>
+<li>The upper bound on the level of robustness achieved for the worst-case population objective and generalisation guarantee use a measure of model complexity that can become prohibitively large for neural networks.</li>
+</ul>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2021    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div>
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="http://www.example.com">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  Deriving backpropagation equations for an LSTM - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://www.example.com/posts/backprop-lstm/">
+    <meta property="og:image" content="http://www.example.com">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="http://www.example.com/posts/backprop-lstm/">
+    <meta name="twitter:image" content="http://www.example.com">
+
+    <base href="http://www.example.com/posts/backprop-lstm/">
+    <title>
+  Deriving backpropagation equations for an LSTM - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="http://www.example.com/posts/backprop-lstm/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="http://www.example.com/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="http://www.example.com/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.96.0" />
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="http://www.example.com/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">Deriving backpropagation equations for an LSTM</h1>
+      <h2 class="date">June 19, 2019</h2>
+
+      
+        <script type="text/javascript" async
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML-full">
+          MathJax.Hub.Config({
+            tex2jax: {
+              inlineMath: [['$','$']],
+              displayMath: [['$$','$$']],
+              processEscapes: true,
+              processEnvironments: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+              TeX: { extensions: ["AMSmath.js", "AMSsymbols.js", "AMSfonts.js"] }
+            }
+          });
+          MathJax.Hub.Queue(function() {
+            
+            
+            
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i = 0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+          });
+          </script>
+      
+    </header>
+
+    <p>In this post I will derive the backpropagation equations for a LSTM cell in vectorised form. It assumes basic knowledge of LSTMs and backpropagation, which you can refresh at <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">Understanding LSTM Networks</a> and <a href="http://arunmallya.github.io/writeups/nn/backprop.html">A Quick Introduction to Backpropagation</a>.</p>
+<h4 id="derivations">Derivations</h4>
+<h5 id="forward-propagation">Forward propagation</h5>
+<p>We will firstly remind ouselves of the forward propagation equations. The nomenclature followed is demonstrated in Figure 1. All equations correspond to one time step.</p>
+
+<div style="text-align: center;">
+<figure style="width:75%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/blog_bplstm_1.png"  />
+    
+    
+    <figcaption>
+        <i>Figure 1: Architecture of a LSTM memory cell at timestep t</i>
+        
+    </figcaption>
+    
+</figure>
+</div>
+
+<p>$\begin{aligned}
+&amp;h_{t-1} \in  \mathbb{R}^{n_{h}}, &amp; \mspace{31mu} x_{t} \in  \mathbb{R}^{n_{x}} \\
+&amp;z_{t}= [h_{t-1}, x_{t}] \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;a_{f}= W_{f}\cdot z_{t} + b_{f},&amp; \mspace{31mu}  f_{t}= \sigma(a_{f}) \\
+&amp;a_{i}= W_{i}\cdot z_{t} + b_{i},&amp; \mspace{40mu}  i_{t}= \sigma(a_{i}) \\
+&amp;a_{o}= W_{o}\cdot z_{t} + b_{o},&amp; \mspace{34mu}  o_{t}= \sigma(a_{o})  \\
+&amp;a_{c}= W_{c}\cdot z_{t} + b_{c},&amp; \mspace{36mu}  \hat{c}_t=  tanh(a_{c}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;{c}_t=  i_{t}\odot \hat{c}_t + f_{t}\odot c_{t-1} \\
+&amp;{h}_t=  o_{t}\odot tanh(c_{t}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;v_{t}= W_{v}\cdot h_{t} + b_{v} \\
+&amp;\hat{y}_t= softmax(v_{t})
+\end{aligned}$</p>
+<h5 id="backward-propagation">Backward propagation</h5>
+<p>Backpropagation through a LSTM is not as straightforward as through other common Deep Learning architectures, due to the special way its underlying layers interact. Nonetheless, the approach is largely the same; identifying dependencies and recursively applying the chain rule.</p>
+
+<div style="text-align: center;">
+<figure style="width:80%;margin-left:auto;margin-right:auto;">
+    
+        <img src="images/blog_bplstm_2.png"  />
+    
+    
+    <figcaption>
+        <i>Figure 2: Backpropagation through a LSTM memory cell</i>
+        
+    </figcaption>
+    
+</figure>
+</div>
+
+<p>Cross-entropy loss with a softmax function are used at the output layer. The standard definition of the derivative of the cross-entropy loss ($\frac{\partial J}{\partial v_{t}}$) is used directly; a detailed derivation can be found here.</p>
+<h5 id="output">Output</h5>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial v_{t}} = \hat{y}_t - y_{t} \\
+&amp;\frac{\partial J}{\partial W_{v}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial W_{v}} \Rightarrow \frac{\partial J}{\partial W_{v}} = \frac{\partial J}{\partial v_{t}} \cdot h_{t}^T \\
+&amp;\frac{\partial J}{\partial b_{v}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial b_{v}} \Rightarrow \frac{\partial J}{\partial b_{v}} = \frac{\partial J}{\partial v_{t}} \end{aligned}$</p>
+<h5 id="hidden-state">Hidden state</h5>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial h_{t}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial h_{t}} \Rightarrow \frac{\partial J}{\partial h_{t}} = W_{v}^T \cdot \frac{\partial J}{\partial v_{t}} \\
+&amp;\frac{\partial J}{\partial h_{t}} += \frac{\partial J}{\partial h_{next}}
+\end{aligned}$</p>
+<h5 id="output-gate">Output gate</h5>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial o_{t}} = \frac{\partial J}{\partial h_{t}} \cdot \frac{\partial h_{t}}{\partial o_{t}} \Rightarrow \frac{\partial J}{\partial o_{t}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial o_{t}} \cdot \frac{\partial o_{t}}{\partial a_{o}} \Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot \frac{d(\sigma (a_{o}))}{da_{o}}  \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot \sigma (a_{o})(1- \sigma (a_{o}))  \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot o_{t}(1- o_{t}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial W_{o}} = \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial W_{o}}  \Rightarrow \frac{\partial J}{\partial W_{o}} = \frac{\partial J}{\partial a_{o}} \cdot z_{t}^T \\
+&amp;\frac{\partial J}{\partial b_{o}} = \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial b_{o}} \Rightarrow \frac{\partial J}{\partial b_{o}} = \frac{\partial J}{\partial a_{o}}
+\end{aligned}$</p>
+<h5 id="cell-state">Cell state</h5>
+<p>$\begin{aligned}
+\frac{\partial J}{\partial c_{t}} = \frac{\partial J}{\partial h_{t}} \cdot \frac{\partial h_{t}}{\partial c_{t}} \Rightarrow \frac{\partial J}{\partial c_{t}} = \frac{\partial J}{\partial h_{t}} \odot o_{t} \odot (1-tanh(c_{t})^2) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+\frac{\partial J}{\partial c_{t}} += \frac{\partial J}{\partial c_{next}} \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial \hat{c}_t} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial \hat{c}_t} \Rightarrow \frac{\partial J}{\partial \hat{c}_t} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial \hat{c}_t} \cdot \frac{\partial \hat{c}_t}{\partial a_{c}} \Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot \frac{d(tanh(a_{c}))}{da_{c}} \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot (1 - tanh(a_{c})^2) \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot (1 - \hat{c}_t^2) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial W_{c}} = \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial W_{c}} \Rightarrow \frac{\partial J}{\partial W_{c}} = \frac{\partial J}{\partial a_{c}} \cdot z_{t}^T \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial b_{c}} = \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial b_{c}} \Rightarrow \frac{\partial J}{\partial b_{c}} = \frac{\partial J}{\partial a_{c}}
+\end{aligned}$</p>
+<h5 id="input-gate">Input gate</h5>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial i_{t}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial i_{t}} \Rightarrow \frac{\partial J}{\partial i_{t}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial i_{t}} \cdot \frac{\partial i_{t}}{\partial a_{i}} \Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot \frac{d(\sigma (a_{i}))}{da_{i}} \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot \sigma (a_{i})(1- \sigma (a_{i})) \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot i_{t}(1- i_{t}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial W_{i}} = \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial W_{i}}  \Rightarrow \frac{\partial J}{\partial W_{i}} = \frac{\partial J}{\partial a_{i}} \cdot z_{t}^T \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+\frac{\partial J}{\partial b_{i}} = \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial b_{i}} \Rightarrow \frac{\partial J}{\partial b_{i}} = \frac{\partial J}{\partial a_{i}}
+\end{aligned}$</p>
+<h5 id="forget-gate">Forget gate</h5>
+<p>$\begin{aligned}
+\frac{\partial J}{\partial f_{t}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial f_{t}} \Rightarrow \frac{\partial J}{\partial f_{t}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial f_{t}} \cdot \frac{\partial f_{t}}{\partial a_{f}} \Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot \frac{d(\sigma (a_{f}))}{da_{f}} \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot \sigma (a_{f})(1- \sigma (a_{f}) \\
+&amp;\Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot f_{t}(1- f_{t}) \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial W_{f}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial W_{f}}  \Rightarrow \frac{\partial J}{\partial W_{f}} = \frac{\partial J}{\partial a_{f}} \cdot z_{t}^T \\
+&amp;\frac{\partial J}{\partial b_{f}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial b_{f}} \Rightarrow \frac{\partial J}{\partial b_{f}} = \frac{\partial J}{\partial a_{f}}
+\end{aligned}$</p>
+<h5 id="input">Input</h5>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial z_{t}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial z_{t}} + \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial z_{t}} + \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial z_{t}} + \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial z_{t}}  \\
+&amp;\Rightarrow \frac{\partial J}{\partial z_{t}} =  W_{f}^T \cdot \frac{\partial J}{\partial a_{f}} +W_{i}^T \cdot \frac{\partial J}{\partial a_{i}} + W_{o}^T \cdot \frac{\partial J}{\partial a_{o}} + W_{c}^T \cdot \frac{\partial J}{\partial a_{c}} \\
+\end{aligned}$</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial h_{t-1}} = \frac{\partial J}{\partial z_{t}}[:n_{h}, :] \\
+&amp;\frac{\partial J}{\partial c_{t-1}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial c_{t-1}} \Rightarrow \frac{\partial J}{\partial c_{t-1}} = \frac{\partial J}{\partial c_{t}} \odot f_{t}
+\end{aligned}$</p>
+<p>The above equations for forward propagation and back propagation will be calculated T times (number of time steps) in each training iteration. At the end of each training iteration, the weights will be updated using the accumulated cost gradient with respect to each weight for all time steps. Assuming Stochastic Gradient Descent, the update equations are the following:</p>
+<p>$\begin{aligned}
+&amp;\frac{\partial J}{\partial W_{f}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{f}^t}, \mspace{31mu} W_{f} += \alpha * \frac{\partial J}{\partial W_{f}} \\
+&amp;\frac{\partial J}{\partial W_{i}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{i}^t}, \mspace{31mu} W_{i} += \alpha * \frac{\partial J}{\partial W_{i}} \\
+&amp;\frac{\partial J}{\partial W_{o}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{o}^t}, \mspace{31mu} W_{o} += \alpha * \frac{\partial J}{\partial W_{o}} \\
+&amp;\frac{\partial J}{\partial W_{c}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{c}^t}, \mspace{31mu} W_{c} += \alpha * \frac{\partial J}{\partial W_{c}} \\
+&amp;\frac{\partial J}{\partial W_{v}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{v}^t}, \mspace{31mu} W_{v} += \alpha * \frac{\partial J}{\partial W_{v}} \\
+\end{aligned}$</p>
+<p>In the <a href="/posts/implement-lstm">next post</a>, we will implement the above equations using Numpy and train the resulting LSTM model on real data.</p>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2021    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div>
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>
