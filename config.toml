@@ -1,0 +1,92 @@
+baseurl = "http://www.example.com" # Hostname (and path) to the root.
+title = "Christina Kouridi" # Site title.
+theme = "hugo-coder-portfolio" # Set the theme.
+languagecode = "en" # The site’s language code used to generate RSS.
+defaultcontentlanguage = "en" # The default content language.
+
+paginate = 20 # Default number of pages per page in pagination.
+
+pygmentsstyle = "b2" # Color-theme or style for syntax highlighting.
+pygmentscodefences = true # Enable code fence background highlighting.
+pygmentscodefencesguesssyntax = true # Enable syntax guessing for code fences without specified language.
+pygmentsUseClasses = true # new add
+
+[params] # theme parameters
+    author = "Christina Kouridi" # Author's name.
+    info = "RESEARCH ENGINEER AT INSTADEEP" # Author's job title or info.
+    description = "Christina Kouridi's personal site" # Site description.
+    keywords = "blog,developer,personal" # Site keywords.
+    avatarurl = "ck.jpg" # Contain the path of the optionnal avatar in the static folder.
+
+    # footercontent = "Enter a text here." # Add  content
+    # fixedbarContent = "Do you want to know me more private?→" # Add fixedbar content
+    # fixedbarContentAfter = "Thank You! Please share it if you like it→" # Add fixedbar content after click
+
+    # Whether you want to hide copyright and credits in the .
+    hideCredits = false
+    hideCopyright = false
+
+    # Custom CSS
+    custom_css = []
+
+    # Alignment of Mobile Menu items
+    itemscentered = true
+
+    # RTL support
+    rtl = false
+
+    # Bottom sns share
+    snsShare = true # new add
+    # Popular sns share
+    # if you want add sns. please message!
+    enableTwitterShare = false  # new add
+    enableFacebookShare = false # new add
+    enableHatenaShare = false   # new add
+    enableLineShare = false     # new add
+    enableLinkedInShare = false # new add
+
+    thumbnail = "ck.jpg" # default sns thumbnail
+
+    # Multilanguage mode
+    langseparator = "|" # Separates menus from language selectors when site is multilingual.
+
+# Social links
+[[params.social]]
+    name = "Github"
+    icon = "fab fa-github"
+    weight = 1
+    url = "https://github.com/christinakouridi/"
+[[params.social]]
+    # If icon is not set, Text is displayed.
+    name = "Google Scholar"
+    icon = "fas fa-graduation-cap"
+    weight = 2
+    url = "https://scholar.google.com/citations?user=QqvI-M4AAAAJ&hl=en"
+[[params.social]]
+    name = "Twitter"
+    icon = "fab fa-twitter"
+    weight = 3
+    url = "https://twitter.com/CKouridi/"
+[[params.social]]
+    name = "LinkedIn"
+    icon = "fab fa-linkedin"
+    weight = 4
+    url = "https://www.linkedin.com/in/christinakouridi/"
+
+# Menu links
+[[menu.main]]
+    name = "About"
+    weight = 1
+    url = "about"
+[[menu.main]]
+    name = "Blog"
+    weight = 2
+    url  = "posts"
+[[menu.main]]
+    name = "Research"
+    weight = 3
+    url  = "research"
+[[menu.main]]
+    name = "Photography"
+    weight = 4
+    url  = "https://christinakouride.wixsite.com/ckouridi-portfolio"
