@@ -2,50 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>christinakouridi.github.io/</loc>
+    <loc>/</loc>
     <lastmod>2021-01-02T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/</loc>
+    <loc>/posts/</loc>
     <lastmod>2021-01-02T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/rl-neurips-2021/</loc>
+    <loc>/posts/rl-neurips-2021/</loc>
     <lastmod>2021-01-02T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/ml-research-toolkit/</loc>
+    <loc>/posts/ml-research-toolkit/</loc>
     <lastmod>2020-10-31T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/paper-notes-wrm/</loc>
+    <loc>/posts/paper-notes-wrm/</loc>
     <lastmod>2020-10-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/marl-challenges/</loc>
+    <loc>/posts/marl-challenges/</loc>
     <lastmod>2020-01-02T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/numba/</loc>
+    <loc>/posts/numba/</loc>
     <lastmod>2019-12-19T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/numpy-gan/</loc>
+    <loc>/posts/numpy-gan/</loc>
     <lastmod>2019-07-09T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/implement-lstm/</loc>
+    <loc>/posts/implement-lstm/</loc>
     <lastmod>2019-06-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/backprop-lstm/</loc>
+    <loc>/posts/backprop-lstm/</loc>
     <lastmod>2019-06-19T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/posts/aws/</loc>
+    <loc>/posts/aws/</loc>
     <lastmod>2019-06-03T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>christinakouridi.github.io/about/</loc>
+    <loc>/about/</loc>
     <priority>0</priority>
   </url><url>
-    <loc>christinakouridi.github.io/photography/</loc>
+    <loc>/photography/</loc>
     <priority>0</priority>
   </url><url>
-    <loc>christinakouridi.github.io/research/</loc>
+    <loc>/research/</loc>
     <priority>0</priority>
   </url><url>
-    <loc>christinakouridi.github.io/categories/</loc>
+    <loc>/categories/</loc>
   </url><url>
-    <loc>christinakouridi.github.io/tags/</loc>
+    <loc>/tags/</loc>
   </url>
 </urlset>
