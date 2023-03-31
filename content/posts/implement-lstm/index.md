@@ -9,7 +9,7 @@ In this post, we will implement a simple character-level LSTM using Numpy. It is
 
 The full code is available on this [GitHub repo](https://github.com/christinakouridi/scratchML/tree/master/LSTM).
 
-{{< img src="images/blog_implementlstm_1.png" title="Figure 1: Architecture of a LSTM memory cell" width="75%">}}
+{{< figure src="images/blog_implementlstm_1.png" title="Figure 1: Architecture of a LSTM memory cell" width="75%">}}
 
 
 ##### Imports
@@ -429,7 +429,7 @@ plt.xlabel("#training iterations")
 plt.ylabel("training loss")
 ```
 
-{{< img src="images/blog_implementlstm_2.png" title="" width="50%">}}
+{{< figure src="images/blog_implementlstm_2.png" title="" width="50%">}}
 
 ##### Improvements
 This implementation prioritised simplicity and clarity over performance, thus there are a few enhancements that are worth mentioning:

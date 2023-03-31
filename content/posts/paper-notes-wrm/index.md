@@ -72,7 +72,7 @@ which is met under two assumptions:
 
 The resulting SGD procedure is demonstrated by Algorithm 1:
 
-{{< img src="images/blog_wrm_1.png" title="" width="60%">}}
+{{< figure src="images/blog_wrm_1.png" title="" width="60%">}}
 
 The convergence properties of this algorithm depends on the loss:
 
@@ -101,13 +101,13 @@ Since the above guarantees only apply for a loss $x \rightarrow \ell(\theta; (x,
 
 To demonstrate the certified robustness of their WRM approach (short for Wasserstein Risk Minimisation), the authors devise a simple supervise learning task. The underlying model is a small neural network with either all ReLU or ELU activations between layers. It is benchmarked against two common baseline models: ERM (short for Empirical Risk Minimisation) and FGM (Fast Gradient Minimisation).
 
-{{< img src="images/blog_wrm_2.png" title="" width="70%">}}
+{{< figure src="images/blog_wrm_2.png" title="" width="70%">}}
 
 Figure 1 shows the classification boundary learnt by each training procedure (separates blue from orange samples). For both activations, **WRM pushes the classification boundaries further outwards than ERM and FGM; intuitively, adversarial examples come from pushing blue points outwards across the boundary**. Additionally, it seems to be less affected by sensitivities in the data than ERM and FGM, **as evident by its more symmetrical shape**. WRM with ELU in particular, yields an axisymmetric classification boundary that hedges against adversarial perturbations in all directions. This demonstrates the certified level of robustness proven in this work.
 
 The authors also demonstrate the certificate of robustness on the worst-case performance for various levels of robustness $\rho$ for the same toy dataset, as well as MNIST:
 
-{{< img src="images/blog_wrm_3.png" title="" width="70%">}}
+{{< figure src="images/blog_wrm_3.png" title="" width="70%">}}
 
 <!-- Experimental results can be reproduced using the [official implementation](https://github.com/duchi-lab/certifiable-distributional-robustness) of the paper in TensorFlow. -->
 

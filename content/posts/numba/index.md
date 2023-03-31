@@ -14,7 +14,7 @@ The easiest way to use it is through a collection of decorators applied to funct
 
 Numba **generates optimised machine code from Python using the industry-standard LLVM compiler library** (instead of a custom-made compiler, which made Numba possible). It handles all of the details around optimising code and generating machine code. The compilation sequence is as follows [[source](https://www.youtube.com/watch?v=-4tD8kNHdXs)]:
 
-{{< img src="images/numba.png" title="Figure 1: Numba compilation sequence" width="75%">}}
+{{< figure src="images/numba.png" title="Figure 1: Numba compilation sequence" width="75%">}}
 
 ##### Numba compilation sequence
 **A key step in the compilation process, is the conversion of the Python function in consideration to Numba’s intermediary representation**. This process involves **swapping supported functions to implementations provided by Numba, that it can translate fast to machine code**. Python objects are stripped from the provided and inferred data types and are translated into representations with no CPython dependencies. This is then converted into LLVM interpretable code and fed into LLVM’S JIT compiler to get machine code. The code is cached, so that the entire compilation process won’t be repeated next time the function is called.

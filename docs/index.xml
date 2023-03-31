@@ -6,7 +6,16 @@
     <description>Recent content on Christina Kouridi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 31 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Resources: Training machine learning models at scale</title>
+      <link>/posts/large-scale-training/</link>
+      <pubDate>Fri, 31 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/large-scale-training/</guid>
+      <description>The ability to train machine learning algorithms at scale has become increasingly important due to the growing size and complexity of datasets and models. Recently this has been enabled more widely by rapid developments in software and hardware techniques and tools. In this article, I outline useful resources for learning how to train machine learning algorithms at large scale. Although some tools were developed for specific deep learning frameworks, they introduce concepts that are generally applicable.</description>
+    </item>
+    
     <item>
       <title>Reinforcement Learning papers at NeurIPS 2021</title>
       <link>/posts/rl-neurips-2021/</link>
@@ -78,7 +87,7 @@ In order to keep up with the latest advancements, I decided to explore their the
       <guid>/posts/implement-lstm/</guid>
       <description>In this post, we will implement a simple character-level LSTM using Numpy. It is trained in batches with the Adam optimiser and learns basic words after just a few training iterations.
 The full code is available on this GitHub repo.
- Figure 1: Architecture of a LSTM memory cell    Imports import numpy as np import matplotlib.pyplot as plt Data preparation Our dataset is J.K. Rowling’s Harry Potter and the Philosopher’s Stone.</description>
+Figure 1: Architecture of a LSTM memory cell Imports import numpy as np import matplotlib.pyplot as plt Data preparation Our dataset is J.K. Rowling’s Harry Potter and the Philosopher’s Stone. I chose this text as the characteristic context and semantic structures present in the abundant dialogue, will help with evaluating the quality of results (also a huge HP fan!</description>
     </item>
     
     <item>
@@ -89,7 +98,7 @@ The full code is available on this GitHub repo.
       <guid>/posts/backprop-lstm/</guid>
       <description>In this post I will derive the backpropagation equations for a LSTM cell in vectorised form. It assumes basic knowledge of LSTMs and backpropagation, which you can refresh at Understanding LSTM Networks and A Quick Introduction to Backpropagation.
 Derivations Forward propagation We will firstly remind ouselves of the forward propagation equations. The nomenclature followed is demonstrated in Figure 1. All equations correspond to one time step.
- Figure 1: Architecture of a LSTM memory cell at timestep t    $\begin{aligned} &amp;amp;h_{t-1} \in \mathbb{R}^{n_{h}}, &amp;amp; \mspace{31mu} x_{t} \in \mathbb{R}^{n_{x}} \\ &amp;amp;z_{t}= [h_{t-1}, x_{t}] \\ \end{aligned}$</description>
+Figure 1: Architecture of a LSTM memory cell at timestep t $\begin{aligned} &amp;amp;h_{t-1} \in \mathbb{R}^{n_{h}}, &amp;amp; \mspace{31mu} x_{t} \in \mathbb{R}^{n_{x}} \\ &amp;amp;z_{t}= [h_{t-1}, x_{t}] \\ \end{aligned}$</description>
     </item>
     
     <item>
@@ -100,7 +109,7 @@ Derivations Forward propagation We will firstly remind ouselves of the forward p
       <guid>/posts/aws/</guid>
       <description>As a beginner in large-scale data manipulation, I quickly found the computational needs of my projects exceeding the capabilities of my personal equipment. I have therefore found Amazon’s EC2 offering very convenient &amp;ndash; renting virtual computers on which computer applications can be run remotely from a local machine, and for free.
 In this post, I detail the process that I have followed to set up an EC2 instance.
-Overview:  Create an AWS account Launch an EC2 instance via the EC2 dashboard Connect to your EC2 instance using SSH Install Anaconda to your EC2 instance Configure Jupyter Notebook Connect to Jupyter Notebook from your local machine Stop your EC2 instance  Step 1: Create an AWS account  Create an AWS account here.</description>
+Overview: Create an AWS account Launch an EC2 instance via the EC2 dashboard Connect to your EC2 instance using SSH Install Anaconda to your EC2 instance Configure Jupyter Notebook Connect to Jupyter Notebook from your local machine Stop your EC2 instance Step 1: Create an AWS account Create an AWS account here.</description>
     </item>
     
     <item>
@@ -110,7 +119,8 @@ Overview:  Create an AWS account Launch an EC2 instance via the EC2 dashboard Co
       
       <guid>/about/</guid>
       <description>Hi there, I&amp;rsquo;m Christina 👋!
-I am currently a research engineer at InstaDeep, focusing on applying reinforcement learning research to combinatorial optimization problems. Prior to this, I was a research intern in the Empirical Inference group at Max Planck Institute for Intelligent Systems, where I worked on distributionally robust optimization with Dr. Jia-Jie Zhu and Prof. Bernhard Schölkopf. This was published as &amp;ldquo;Adversarially Robust Kernel Smoothing&amp;rdquo; (oral presentation at AISTATS 2022).</description>
+I&amp;rsquo;m a research engineer based in London, with a particular interest in training machine learning research algorithms at a large-scale, and applying them to impactufl real-world applications.
+Most recently, I contributed to building DeepPack as a research engineer at InstaDeep. This involved applying reinforcement learning to BinPacking &amp;ndash; an NP-hard combinatorial optimization problem &amp;ndash; in a way that is computationally efficient and generalisable to unseen client data.</description>
     </item>
     
     <item>

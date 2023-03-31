@@ -11,7 +11,7 @@ In this post I will derive the backpropagation equations for a LSTM cell in vect
 ##### Forward propagation
 We will firstly remind ouselves of the forward propagation equations. The nomenclature followed is demonstrated in Figure 1. All equations correspond to one time step.
 
-{{< img src="images/blog_bplstm_1.png" title="Figure 1: Architecture of a LSTM memory cell at timestep t" width="75%">}}
+{{< figure src="images/blog_bplstm_1.png" title="Figure 1: Architecture of a LSTM memory cell at timestep t" width="75%">}}
 
 $\begin{aligned}
 &h\_{t-1} \in  \mathbb{R}^{n\_{h}}, & \mspace{31mu} x\_{t} \in  \mathbb{R}^{n\_{x}} \\\
@@ -39,7 +39,7 @@ $\begin{aligned}
 
 Backpropagation through a LSTM is not as straightforward as through other common Deep Learning architectures, due to the special way its underlying layers interact. Nonetheless, the approach is largely the same; identifying dependencies and recursively applying the chain rule.
 
-{{< img src="images/blog_bplstm_2.png" title="Figure 2: Backpropagation through a LSTM memory cell" width="80%">}}
+{{< figure src="images/blog_bplstm_2.png" title="Figure 2: Backpropagation through a LSTM memory cell" width="80%">}}
 
 Cross-entropy loss with a softmax function are used at the output layer. The standard definition of the derivative of the cross-entropy loss ($\frac{\partial J}{\partial v\_{t}}$) is used directly; a detailed derivation can be found here.
 

@@ -11,7 +11,7 @@ In this post, I will share the key tools in my machine learning research workflo
 Tmux is a terminal multiplexer; it facilitates running and organising sessions on the terminal. Specifically, it enables alternating between several sessions in one terminal, and restoring their state after detachment (i.e. closing the terminal window does not terminate them). Those sessions can be viewed at the same time by splitting the terminal view.
 
 
-{{< img src="images/blog_mltoolkit_1.png" title="Figure 1: example tmux session with split terminal view" width="90%">}}
+{{< figure src="images/blog_mltoolkit_1.png" title="Figure 1: example tmux session with split terminal view" width="90%">}}
 
 A common alternative is Linux’s native [Screen](https://linuxize.com/post/how-to-use-linux-screen/), however it is less user friendly. In addition, screen layouts do not automatically persist.
 
@@ -30,7 +30,7 @@ PyCharm is an engineering marvel, and students get to enjoy the full range of fe
 - various developer tools, such as built-in terminal, debugger and test runner
 - python profiling for speed improvements
 
-{{< img src="images/blog_mltoolkit_2.png" title="Figure 2: example line profiling in PyCharm" width="90%">}}
+{{< figure src="images/blog_mltoolkit_2.png" title="Figure 2: example line profiling in PyCharm" width="90%">}}
 
 ---
 
@@ -50,7 +50,7 @@ This is perhaps one of the least known tools on my list, but the one that has im
 
 Particularly useful is the ability to plot aggregated results, for example the average training curve across multiple random seeds, along with an indication of variation (e.g. min and max bounds, standard deviation or standard error). Plots are almost paper-ready and fairly customisable, but if you want to add just that little bit of matplotlib magic, the exact data points can be exported to a .csv file.
 
-{{< img src="images/blog_mltoolkit_3.png" title="Figure 3: example aggregated experimental results in Weights & Biases" width="95%">}}
+{{< figure src="images/blog_mltoolkit_3.png" title="Figure 3: example aggregated experimental results in Weights & Biases" width="95%">}}
 
 Integration couldn’t be easier; only a couple of lines of code are needed in a python script. Luckily, it is also compatible with both PyTorch and TensorFlow.
 
@@ -64,7 +64,7 @@ I have experimented with various note taking apps for research, and life in gene
 
 Another neat feature is the ability to host pages without any of the typical configuration (e.g. a [page](https://www.notion.so/Agent-Analysis-678a4693229542868f2d526e132df4cd) that I created to showcase results for a project).
 
-{{< img src="images/blog_mltoolkit_4.png" title="Figure 4: example Notion page for tracking paper notes" width="95%">}}
+{{< figure src="images/blog_mltoolkit_4.png" title="Figure 4: example Notion page for tracking paper notes" width="95%">}}
 
 Although they don’t provide the range of hand-writing features that OneNote does (e.g. hand-written notes on embedding pdfs, search through hand-written notes), Notion is actively developing these much sought-after capabilities (as evident by the recently announced hand-written to digital text conversion using Apple Pencil).
 

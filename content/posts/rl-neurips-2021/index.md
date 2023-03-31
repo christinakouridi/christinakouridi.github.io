@@ -18,7 +18,7 @@ Recent works have shown data augmentation to be an effective technique for impro
 1. Firstly, the authors propose **data-regularised actor-critic (DrAC) that applies data augmentation to actor-critic algorithms in a theoretically justified way**. This involves **two novel regularisation terms for the policy and value functions, that ensures they are invariant to transformations induced by various augmentations** (i.e. their values given the augmented observation are constrained to be close to their values given the original observation).
 2. Secondly, they propose **three methods for automatically selecting an effective augmentation for an RL task**. The best performing method — UCB-DrAC — finds the best augmentation within a fixed set using a variant of the upper confidence bound (UCB) algorithm (illustrated in Figure 1). The second approach — RL2-DrAC — does so using a meta-learning approach. The third method — Meta-DrAC — directly meta-learns the weights of a convolutional network without access to predefined transformations.
 
-{{< img src="images/blog_neurips_1.png" width="88%">}}
+{{< figure src="images/blog_neurips_1.png" width="88%">}}
 
 **Results**  
 The authors exhibit state-of-the-art generalisation performance on the ProcGen benchmark, outperformance of popular RL methods on four DeepMind Control tasks, and some evidence on DrAC learning policies and representations that better capture task invariances.
@@ -45,7 +45,7 @@ Introduces a class of unsupervised environment design for adaptive RL curricula 
 **Contributions**  
 1. The authors **introduce a class of UED methods called dual curriculum design (DCD)**. In DCD, a student policy is challenged by a team of two co-evolving teachers (illustrated in Figure 2). One teacher generates new challenging levels dynamically, while the other prioritises existing levels for replay. The authors show that PAIRED and PLR are members of the DCD class, and that all DCD algorithms enjoy certain minimax regret guarantees.
 
-{{< img src="images/blog_neurips_2.png" width="70%">}}
+{{< figure src="images/blog_neurips_2.png" width="70%">}}
 
 2. They then extend PLR to two algorithms with similar robustness guarantees to that of PAIRED: 
     a) **robust PLR that learns only on trajectories sampled by the PLR teacher** (other teacher is a random level generator)
@@ -97,7 +97,7 @@ The authors provide practical recommendations for evaluating performance, which 
 
 Common metrics can be problematic: **mean is easily dominated by performance on a few outlier tasks, while median has high variability and is unaffected by zero scores on nearly half of the tasks**.
 
-{{< img src="images/blog_neurips_4.png" title="Figure 3. Visual representation of recommended statistical evaluation tools" width="100%">}}
+{{< figure src="images/blog_neurips_4.png" title="Figure 3. Visual representation of recommended statistical evaluation tools" width="100%">}}
 
 
 **Results**  
@@ -125,7 +125,7 @@ It has often been observed empirically that generalisation to new test-time cont
 **Results**  
 Policies learned through approximations of the epistemic POMDP obtain better test-time performance on the Procgen benchmark than those learned by standard RL algorithms (shown in Figure 4).
 
-{{< img src="images/blog_neurips_3.png" width="65%">}}
+{{< figure src="images/blog_neurips_3.png" width="65%">}}
 
 **Remarks**  
 **Although LEEP only seems able to optimise a crude approximation to the epistemic POMDP**, it opens avenue for developing algorithms that can handle epistemic uncertainty, and thereby generalise to new contexts better.
