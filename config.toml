@@ -15,7 +15,7 @@ pygmentsUseClasses = true # new add
 
 [params] # theme parameters
     author = "Christina Kouridi" # Author's name.
-    info = "RESEARCH ENGINEER AT INSTADEEP" # Author's job title or info.
+    info = "RESEARCH ENGINEER" # Author's job title or info.
     description = "Christina Kouridi's personal site" # Site description.
     keywords = "blog,developer,personal" # Site keywords.
     avatarurl = "ck.jpg" # Contain the path of the optionnal avatar in the static folder.
