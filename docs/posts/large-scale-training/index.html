@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="/">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  Resources: Training machine learning models at scale - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/posts/large-scale-training/">
+    <meta property="og:image" content="/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="/posts/large-scale-training/">
+    <meta name="twitter:image" content="/">
+
+    <base href="/posts/large-scale-training/">
+    <title>
+  Resources: Training machine learning models at scale - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="/posts/large-scale-training/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.111.3">
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">Resources: Training machine learning models at scale</h1>
+      <h2 class="date">March 31, 2023</h2>
+
+      
+    </header>
+
+    <p>The ability to train machine learning algorithms at scale has become increasingly important due to the growing size and complexity of datasets and models. Recently this has been enabled more widely by rapid developments in software and hardware techniques and tools. In this article, I outline useful resources for learning how to train machine learning algorithms at large scale. Although some tools were developed for specific deep learning frameworks, they introduce concepts that are generally applicable.</p>
+<h5 id="efficient-training-on-multiple-gpus-linkhttpshuggingfacecodocstransformersperf_train_gpu_many">&ldquo;Efficient Training on Multiple GPUs&rdquo; [<a href="https://huggingface.co/docs/transformers/perf_train_gpu_many">link</a>]</h5>
+<p>Describes parallelism methods for large-scale training on multiple machines: data parallelism, tensor parallelism, pipeline parallelism, and Zero Redundancy Optimizer (ZeRO) [<a href="https://arxiv.org/pdf/1910.02054.pdf">link</a>]. It also includes a general strategy on deciding which technique — or combination of techniques — to use.</p>
+<p>The optimal set of techniques depends on the training setting and available hardware. Nonetheless, ZeRO is generally recommended across scenarios (e.g. when the model can fit in memory or not, in single or multi GPU settings).</p>
+<p>ZeRO reduces the memory consumption of each GPU by partitioning model training states (weights, gradients, and optimizer states) across available devices (this is called “sharding”) in the training hardware. It is however less effective on its own in the presence of slow internode connectivity.</p>
+<hr>
+<h5 id="how-to-train-really-large-models-on-many-gpus-linkhttpslilianwenggithubioposts2021-09-25-train-large">&ldquo;How to Train Really Large Models on Many GPUs?&rdquo; [<a href="https://lilianweng.github.io/posts/2021-09-25-train-large/">link</a>]</h5>
+<p>Similarly to the above, it motivates and discusses training parallelism methods, but with additional reference to papers using specific techniques. Parallelism can be combined with optimizing the memory footprint of training and its running speed — the article outlines standard ways: CPU offloading, mixed precision training, gradient checkpointing, compression and memory efficient optimisers.</p>
+<hr>
+<h5 id="efficient-training-on-a-single-gpu-linkhttpshuggingfacecodocstransformersperf_train_gpu_one">&ldquo;Efficient Training on a Single GPU&rdquo; [<a href="https://huggingface.co/docs/transformers/perf_train_gpu_one">link</a>]</h5>
+<p>This article discusses and demonstrates ways to reduce the memory footprint and speed of training on one GPU, for models that may not fit in memory. This includes: gradient accumulation, gradient checkpointing, mixed precision training, optimizing the batch size, optimizer choice, data loader design, and Microsoft&rsquo;s DeepSpeed ZerO. These constitute useful techniques for optimizing memory usage even if you plan to train on multiple machines because they can enable training at a larger-scale, or with fewer resources.</p>
+<hr>
+<h5 id="tensor-parallelism-with-jaxpjit-linkhttpsirhumgithubioblogpjit">&ldquo;Tensor Parallelism with jax.pjit&rdquo; [<a href="https://irhum.github.io/blog/pjit/">link</a>]</h5>
+<p>If you understand things better when you put numbers to them, this article is for you! It provides excellent demonstrations of different ways of applying tensor parallelism to neural network training, and a tutorial on how to implement it for a 15 billion parameter language model in JAX using pjit.</p>
+<p>pjit is generally flexible and simple to use, however figuring out the optimal sharding dimensions needs careful thought to avoid duplicated tensor copies. This is an active development area for JAX, with new tools to distribute and automatically parallelize array computations being frequently released.</p>
+<hr>
+<h5 id="scalable-training-of-language-models-using-jax-pjit-and-tpuv4-linkhttpsarxivorgpdf220406514pdf">&ldquo;Scalable Training of Language Models using JAX pjit and TPUv4&rdquo; [<a href="https://arxiv.org/pdf/2204.06514.pdf">link</a>]</h5>
+<p>This is technical report on Cohere&rsquo;s [<a href="https://cohere.ai/">link</a>] distributed training framework, which utilizes TPU V4 Pods (a Pod is a group of TPU devices connected by high-speed interconnects) and JAX (specifically pjit) to perform efficient, large-scale, parallel computation. It includes useful practical considerations for training on multiple hosts unlike other articles. One of their key design conclusions is that as long as the model resides on a hardware unit with fast interconnect between accelerators, it&rsquo;s sufficient and even optimal to use tensor and data parallelism only. This is the case with TPUs, but less so for GPUs, especially for architectures prior to the H100 [<a href="https://www.nvidia.com/en-gb/data-center/h100/">link</a>]. When interconnect is slow, due to the frequent communication needed by Tensor Parallelism, it&rsquo;s often used for parallelism across machines on a single host, and Pipeline Parallelism can be used for parallelism across hosts.</p>
+<hr>
+<h5 id="scaling-language-models-methods-analysis--insights-from-training-gopher-linkhttpsarxivorgpdf211211446pdf">&ldquo;Scaling Language Models: Methods, Analysis &amp; Insights from Training Gopher&rdquo; [<a href="https://arxiv.org/pdf/2112.11446.pdf">link</a>]</h5>
+<p>This paper provides a detailed overview of the methods and insights gained from training a 10-280 million parameter transformer model (Gopher) and highlights the importance of using efficient training techniques to achieve high performance on large language models.</p>
+<p>Specifically, section “C. Lessons Learned” includes a discussion on training with the adafactor optimiser instead of adam, and mixed-precision training. The Adafactor optimizer [<a href="https://arxiv.org/abs/1804.04235">link</a>] can reduce the memory footprint of training compared to Adam with minimal code changes. Instead of keeping the rolling average for each element in the weight matrices, Adafactor only stores aggregated information (row- and column-wise sums of the rolling averages) which reduces the footprint considerably. The performance of adafactor however tends to be worse for extremely large models, and more unstable; these can be mitigated by lowering the learning rate and training for longer.</p>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2023    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div class="fixed-bar">
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

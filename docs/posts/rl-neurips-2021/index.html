@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="/">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  Reinforcement Learning papers at NeurIPS 2021 - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/posts/rl-neurips-2021/">
+    <meta property="og:image" content="/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="/posts/rl-neurips-2021/">
+    <meta name="twitter:image" content="/">
+
+    <base href="/posts/rl-neurips-2021/">
+    <title>
+  Reinforcement Learning papers at NeurIPS 2021 - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="/posts/rl-neurips-2021/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.111.3">
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">Reinforcement Learning papers at NeurIPS 2021</h1>
+      <h2 class="date">January 2, 2021</h2>
+
+      
+    </header>
+
+    <p>Notes on Reinforcement Learning papers at NeurIPS 2021.</p>
+<h5 id="1-automatic-data-augmentation-for-generalisation-in-reinforcement-learning-arxivhttpsarxivorgabs200612862-githubhttpsgithubcomrraileanuauto-drac">1. Automatic Data Augmentation for Generalisation in Reinforcement Learning [<a href="https://arxiv.org/abs/2006.12862">arXiv</a>, <a href="https://github.com/rraileanu/auto-drac">GitHub</a>]</h5>
+<p><strong>TL;DR</strong><br>
+Proposes a theoretically motivated way of using data augmentation with actor-critic algorithms, and a practical approach for automatically selecting an effective augmentation to improve generalisation in RL.</p>
+<p><strong>Motivation</strong><br>
+Recent works have shown data augmentation to be an effective technique for improving sample efficiency and generalisation in RL. However, the authors <strong>cast past applications of data augmentation to RL theoretically unsound due to inaccurate importance sampling estimates</strong>. Additionally, <strong>the choice of data augmentation is arbitrary and fixed</strong>, but different tasks have different biases and hence may need different data transformations.</p>
+<p><strong>Contributions</strong></p>
+<ol>
+<li>Firstly, the authors propose <strong>data-regularised actor-critic (DrAC) that applies data augmentation to actor-critic algorithms in a theoretically justified way</strong>. This involves <strong>two novel regularisation terms for the policy and value functions, that ensures they are invariant to transformations induced by various augmentations</strong> (i.e. their values given the augmented observation are constrained to be close to their values given the original observation).</li>
+<li>Secondly, they propose <strong>three methods for automatically selecting an effective augmentation for an RL task</strong>. The best performing method — UCB-DrAC — finds the best augmentation within a fixed set using a variant of the upper confidence bound (UCB) algorithm (illustrated in Figure 1). The second approach — RL2-DrAC — does so using a meta-learning approach. The third method — Meta-DrAC — directly meta-learns the weights of a convolutional network without access to predefined transformations.</li>
+</ol>
+<figure><img src="images/blog_neurips_1.png" width="88%"/>
+</figure>
+
+<p><strong>Results</strong><br>
+The authors exhibit state-of-the-art generalisation performance on the ProcGen benchmark, outperformance of popular RL methods on four DeepMind Control tasks, and some evidence on DrAC learning policies and representations that better capture task invariances.</p>
+<p><strong>Remarks</strong></p>
+<ol>
+<li><strong>The regularisation terms of DrAC</strong> can be readily added to the objective of any actor-critic algorithm with a discrete stochastic policy (e.g. IMPALA, A3C).</li>
+<li>Although the experiments make use of environments with observations in raw image format, <strong>DrAC can be adapted to other types of input</strong> (e.g. low dimensional symbolic representations) <strong>by defining an appropriate set of augmentations</strong>.</li>
+</ol>
+<hr>
+<h5 id="2-replay-guided-adversarial-environment-design-arxivhttpsarxivorgpdf211002439pdf">2. Replay-Guided Adversarial Environment Design [<a href="https://arxiv.org/pdf/2110.02439.pdf">arXiv</a>]</h5>
+<p><strong>TL;DR</strong><br>
+Introduces a class of unsupervised environment design for adaptive RL curricula that unifies prior methods (PAIRED and PLR), and extends them to two algorithms with theoretical guarantees on reaching an equilibrium policy that optimally trades off regret across training levels.</p>
+<p><strong>Motivation</strong><br>
+<strong>Training deep RL agents on sufficiently diverse and informative variations of environments (termed levels) can improve the generalisability and robustness of the learnt policies to unseen levels.</strong> Therefore, RL agents can benefit from formalised methods that automatically adapt the distribution over environment variations throughout training based on the agents’ learning.</p>
+<p><strong>Background</strong></p>
+<ol>
+<li>This work follows the authors’ prior paper <strong>“Prioritised Level Replay” (PLR)</strong>[<a href="https://arxiv.org/pdf/2010.03934.pdf">arXiv</a>, <a href="https://github.com/facebookresearch/level-replay">GitHub</a>]. It first <strong>introduces PLR as a practical method to induce adaptive curricula</strong> that improve the sample efficiency and generalisation of RL policies in environments with many tasks / levels. <strong>PLR selectively samples randomly generated training levels weighted by a function of recent temporal-difference (TD) errors experienced on each level (effectively L1 value loss)</strong>. This follow-up work, <strong>extends PLR with theoretical guarantees by partly replacing the L1 value loss prioritisation with a regret prioritisation, as L1 value loss can bias the long-term training behaviour towards high-variance policies</strong>.</li>
+<li><strong>Protagonist Antagonist Induced Regret Environment Design (PAIRED)</strong> [<a href="https://arxiv.org/pdf/2012.02096.pdf">arXiv</a>] is another prominent work that demonstrated the need for adaptive environment curriculum learning. Whereas <strong>PLR prioritises past levels based on their estimated learning potential if replayed, PAIRED actively generates new levels assuming control of a parameterised environment generator</strong>.</li>
+<li><strong>PAIRED belongs to a self-supervised RL paradigm called unsupervised environment design (UED)</strong>. In UED, <strong>an environment generator (a teacher) is co-evolved with a student policy that trains on levels actively proposed by the teacher, inducing dynamic curriculum learning</strong>. PAIRED enjoys a useful robustness characterisation of the final student policy in the form of a minimax regret guarantee (optimally trades off regret across training levels), assuming that its underlying teacher-student multi-agent system reaches a Nash equilibrium (NE).</li>
+</ol>
+<p><strong>Contributions</strong></p>
+<ol>
+<li>The authors <strong>introduce a class of UED methods called dual curriculum design (DCD)</strong>. In DCD, a student policy is challenged by a team of two co-evolving teachers (illustrated in Figure 2). One teacher generates new challenging levels dynamically, while the other prioritises existing levels for replay. The authors show that PAIRED and PLR are members of the DCD class, and that all DCD algorithms enjoy certain minimax regret guarantees.</li>
+</ol>
+<figure><img src="images/blog_neurips_2.png" width="70%"/>
+</figure>
+
+<ol start="2">
+<li>They then extend PLR to two algorithms with similar robustness guarantees to that of PAIRED:
+a) <strong>robust PLR that learns only on trajectories sampled by the PLR teacher</strong> (other teacher is a random level generator)
+b) <strong>Replay-enhanced PAIRED (REPAIRED) which extends PLR to make use of PAIRED as a level generator</strong> instead of the random teacher</li>
+</ol>
+<p><strong>Results</strong></p>
+<ul>
+<li>Interestingly, stopping the agent from updating its policy on uncurated levels (i.e. training on less data), improves convergence to NE.</li>
+<li>Robust PLR and REPAIRED outperform the sample-efficiency and zero-shot generalisation of alternative UED methods across a maze domain and a novel car-racing domain.</li>
+</ul>
+<hr>
+<h5 id="3-on-the-expressivity-of-markov-reward-arxivhttpsarxivorgpdf211100876pdf">3. On the Expressivity of Markov Reward [<a href="https://arxiv.org/pdf/2111.00876.pdf">arXiv</a>]</h5>
+<p><strong>TL;DR</strong><br>
+The paper studies the ability of Markov reward to represent tasks defined as a set of acceptable policies, partial ordering over policies, and partial ordering over trajectories.</p>
+<p><strong>Motivation</strong><br>
+RL is framed by the expressivity of reward as an optimisation signal, also referred to as the reward hypothesis: <em>“…all of what we mean by goals and purposes can be well thought of as maximisation of the expected value of the cumulative sum of a received scalar signal (reward)”</em>. Despite being a backdrop assumption, <strong>it lacks grounded theory and formalisation of situations in which Markov rewards are sufficient to express certain tasks</strong>.</p>
+<p><strong>Contribution</strong></p>
+<ol>
+<li>The authors focus on three possible notions of task:
+<ul>
+<li>a set of acceptable policies (SOAP)</li>
+<li>partial ordering (PO) over policies</li>
+<li>partial ordering over trajectories (TO)
+They show that <strong>for these task notions, there exist task instances that can’t be distinguished or expressed by a single Markov reward function</strong> (Markov in the environment state). <strong>This is often misinterpreted as some tasks not being expressible by a reward function</strong>. A simple example is the task <em>“always move the same direction”</em> in a grid world. The SOAP <em>{“always move right”, “always move left”, ”always move down”, “always move up”}</em> conveys this task, but no single Markov reward function can make these policies strictly higher in value than all others.</li>
+</ul>
+</li>
+<li>They propose polynomial-time algorithms to construct a Markov reward function that allows an agent to optimise tasks of each of these three types, and determine when no such reward function exists.</li>
+</ol>
+<p><strong>Remarks.</strong> An interesting thought is how these theorems would apply to POMDPs, as tasks could be made infinitely expressible by extending state to include history.</p>
+<hr>
+<h5 id="4-deep-reinforcement-learning-at-the-edge-of-the-statistical-precipice-arxivhttpsarxivorgpdf210813264pdf-githubhttpsgithubcomgoogle-researchrliable">4. Deep Reinforcement Learning at the Edge of the Statistical Precipice [<a href="https://arxiv.org/pdf/2108.13264.pdf">arXiv</a>, <a href="https://github.com/google-research/rliable">GitHub</a>]</h5>
+<p><strong>TL;DR</strong><br>
+Statistics protocols for evaluation deep RL algorithms on a suite of tasks, which minimise statistical uncertainty of results consisting of a handful of runs per task.</p>
+<p><strong>Motivation</strong><br>
+Evaluating deep RL algorithms on research benchmarks <strong>with multiple tasks</strong> requires significant training time. <strong>Most published works compare point estimates of aggregate performance such as mean and median scores across tasks, ignoring the statistical uncertainty arising from the use of a finite number of training runs</strong>. This can result in invalid conclusions, and harder reproducibility.</p>
+<p><strong>Contribution</strong><br>
+The authors provide practical recommendations for evaluating performance, which treat performance estimates based on a finite number of runs as a random variable:</p>
+<ol>
+<li><strong>For measuring uncertainty in aggregate performance, use interval estimates</strong> via stratified bootstrap confidence intervals, as opposed to point estimates</li>
+<li><strong>For measuring variability in performance across tasks and runs</strong>, use performance profiles that are robust to outlier runs / tasks</li>
+<li>For computing an aggregate metric of overall performance, use robust statistics such as:
+<ul>
+<li><strong>interquartile mean</strong>: the mean score of the middle 50% of the runs combined across all tasks</li>
+<li><strong>optimality gap</strong>: the amount by which the algorithm fails to meet a chosen target minimum score</li>
+<li><strong>average probability of improvement</strong>: how likely it is for an algorithm X to outperform algorithm Y on a randomly selected task</li>
+</ul>
+</li>
+</ol>
+<p>Common metrics can be problematic: <strong>mean is easily dominated by performance on a few outlier tasks, while median has high variability and is unaffected by zero scores on nearly half of the tasks</strong>.</p>
+<figure><img src="images/blog_neurips_4.png" width="100%"/><figcaption>
+            <h4>Figure 3. Visual representation of recommended statistical evaluation tools</h4>
+        </figcaption>
+</figure>
+
+<p><strong>Results</strong></p>
+<ul>
+<li>The authors scrutinise performance evaluations of existing algorithms on common benchmarks such as ALE, ProcGen, and the DeepMind Control Suite, <strong>revealing discrepancies in prior comparisons</strong>.</li>
+<li>Through various case studies, they also demonstrate the deficiencies of commonly reported performance metrics, such as point estimates of median scores on Atari 100k.</li>
+</ul>
+<p><strong>Remarks</strong><br>
+This is <strong>an important work for supporting reliable evaluation in RL research</strong>. For rigorous statistical comparisons of single-task RL algorithms, check the paper <em>“A Hitchhiker’s Guide to Statistical Comparisons of Reinforcement Learning algorithms”</em> [<a href="https://arxiv.org/pdf/1904.06979.pdf">arXiv</a>, <a href="https://github.com/ccolas/rl_stats">GitHub</a>].</p>
+<hr>
+<h5 id="5-why-generalisation-in-rl-is-difficult-epistemic-pomdps-and-implicit-partial-observability-arxivhttpsarxivorgabs210706277">5. Why Generalisation in RL is Difficult: Epistemic POMDPs and Implicit Partial Observability [<a href="https://arxiv.org/abs/2107.06277">arXiv</a>]</h5>
+<p><strong>TL;DR</strong><br>
+Trying to generalise induces a POMDP, even if the problem is an MDP, arising from epistemic uncertainty about the true MDP at test-time. The authors formalise this as “epistemic POMDP”, call for new approaches to solve the generalisation problem, and propose an ensemble-based algorithm to approximately solve it.</p>
+<p><strong>Motivation</strong><br>
+It has often been observed empirically that generalisation to new test-time contexts is a significant challenge for deep RL agents. Nonetheless, it has remained an open question whether the RL setting itself poses additional challenges to generalisation beyond those found in supervised learning.</p>
+<p><strong>Contribution</strong></p>
+<ol>
+<li>In supervised learning, optimising for performance on the training set (i.e. empirical risk minimisation (ERM)) can result in good generalisation performance in the absence of distribution shifts and with appropriate inductive biases. <strong>The authors show that such ERM approach can be sub-optimal for generalising to new test-time contexts in RL, even when these new contexts are drawn from the training distribution</strong>.</li>
+<li><strong>Using a Bayesian RL perspective, they reframe generalisation as the problem of solving a partially observable MDP, which they call “epistemic PODMP”</strong>. The epistemic POMDP highlights that generalising in RL is more difficult than supervised learning due to partial observability induced by epistemic uncertainty. When the agent’s posterior distribution over environments can be calculated, <strong>constructing the epistemic POMDP and running a POMDP-solving algorithm on it will yield a Bayes-optimal policy for maximising test-time performance</strong>.</li>
+<li>They propose one such algorithm, called LEEP — it learns different policies for sampled environments regularised to make the policies similar, and then combines them into a single policy that is close to optimal.</li>
+</ol>
+<p><strong>Results</strong><br>
+Policies learned through approximations of the epistemic POMDP obtain better test-time performance on the Procgen benchmark than those learned by standard RL algorithms (shown in Figure 4).</p>
+<figure><img src="images/blog_neurips_3.png" width="65%"/>
+</figure>
+
+<p><strong>Remarks</strong><br>
+<strong>Although LEEP only seems able to optimise a crude approximation to the epistemic POMDP</strong>, it opens avenue for developing algorithms that can handle epistemic uncertainty, and thereby generalise to new contexts better.</p>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2023    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div class="fixed-bar">
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

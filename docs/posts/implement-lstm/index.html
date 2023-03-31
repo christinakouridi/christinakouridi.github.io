@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="/">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  Implementing a LSTM from scratch with Numpy - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/posts/implement-lstm/">
+    <meta property="og:image" content="/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="/posts/implement-lstm/">
+    <meta name="twitter:image" content="/">
+
+    <base href="/posts/implement-lstm/">
+    <title>
+  Implementing a LSTM from scratch with Numpy - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="/posts/implement-lstm/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.111.3">
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">Implementing a LSTM from scratch with Numpy</h1>
+      <h2 class="date">June 20, 2019</h2>
+
+      
+    </header>
+
+    <p>In this post, we will implement a simple character-level LSTM using Numpy. It is trained in batches with the Adam optimiser and learns basic words after just a few training iterations.</p>
+<p>The full code is available on this <a href="https://github.com/christinakouridi/scratchML/tree/master/LSTM">GitHub repo</a>.</p>
+<figure><img src="images/blog_implementlstm_1.png" width="75%"/><figcaption>
+            <h4>Figure 1: Architecture of a LSTM memory cell</h4>
+        </figcaption>
+</figure>
+
+<h5 id="imports">Imports</h5>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span></code></pre></div><h5 id="data-preparation">Data preparation</h5>
+<p>Our dataset is J.K. Rowling’s Harry Potter and the Philosopher’s Stone. I chose this text as the characteristic context and semantic structures present in the abundant dialogue, will help with evaluating the quality of results (also a huge HP fan!).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;HP1.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span></span></code></pre></div><p>We will compute the size of our vocabulary and mapping dictionaries from characters to indices and vice-versa, which will be used for transforming the input data to an appropriate format later on.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">chars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;data has </span><span class="si">%d</span><span class="s1"> characters, </span><span class="si">%d</span><span class="s1"> unique&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">vocab_size</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">char_to_idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl"><span class="n">idx_to_char</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">w</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+</span></span></code></pre></div><p><em>data has 442744 characters, 54 unique</em></p>
+<h5 id="initialisation-of-model-parameters">Initialisation of model parameters</h5>
+<p>We will wrap all functions in the LSTM class.</p>
+<p>There is not conclusive evidence on which optimiser performs best for this type of architecture. In this implementation, we will use the Adam optimiser, as <a href="https://arxiv.org/abs/1412.6980">general empirical results</a> demonstrate that it performs favourably compared to other optimisation methods, it converges fast and can effectively navigate local minima by adapting the learning rate for each parameter. The moving averages, $\beta_{1}$ and $\beta_{2}$ are initialised as suggested in the original paper. Here’s <a href="https://ruder.io/optimizing-gradient-descent/index.html#adam">a quick explanation</a> of how Adam works and how it compares to other methods.</p>
+<p>After the learning rate, weight initialisation is the second most important setting for LSTMs and other recurrent networks; improper initialisation could slow down the training process to the point of impracticality. We will therefore use the high-performing Xavier initialisation, which involves randomly sampling weights from a distribution $\mathcal{N}(0, \frac{1}{\sqrt{n}})$, where n is the number of neurons in the preceding layer.</p>
+<p>The input to the LSTM, z, has dimensions [vocab_size + $n_h$, 1] . Since the LSTM layer wants to output $n_h$ neurons, each weight should be of size [$n_h$, vocab_size + $n_h$] and each bias of size [$n_h$, 1]. Exception is the weight and bias at the output softmax layer ($W_v$, $b_v$). The resulting output will be a probability distribution over all possible characters in the vocabulary, therefore of size [vocab_size, 1], hence $W_v$ should be of size [vocab_size, $n_h$] and bv of size [$n_h$, 1].</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">LSTM</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_to_idx</span><span class="p">,</span> <span class="n">idx_to_char</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_h</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">seq_len</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                          <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">beta1</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">beta2</span><span class="o">=</span><span class="mf">0.999</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">char_to_idx</span> <span class="o">=</span> <span class="n">char_to_idx</span> <span class="c1"># characters to indices mapping</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_char</span> <span class="o">=</span> <span class="n">idx_to_char</span> <span class="c1"># indices to characters mapping</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span> <span class="o">=</span> <span class="n">vocab_size</span> <span class="c1"># no. of unique characters in the training data</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="o">=</span> <span class="n">n_h</span> <span class="c1"># no. of units in the hidden layer</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">=</span> <span class="n">seq_len</span> <span class="c1"># no. of time steps, also size of mini batch</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="n">epochs</span> <span class="c1"># no. of training iterations</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span> <span class="c1"># learning rate</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">beta1</span> <span class="o">=</span> <span class="n">beta1</span> <span class="c1"># 1st momentum parameter</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">beta2</span> <span class="o">=</span> <span class="n">beta2</span> <span class="c1"># 2nd momentum parameter</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">        <span class="c1">#-----initialise weights and biases-----#</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">))</span> <span class="c1"># Xavier initialisation</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># forget gate</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wf&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bf&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># input gate</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wi&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bi&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># cell gate</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wc&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bc&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># output gate</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wo&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bo&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span> <span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># output</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wv&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">)</span> <span class="o">*</span> \
+</span></span><span class="line"><span class="cl">                                          <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bv&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span> <span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">#-----initialise gradients and Adam parameters-----#</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">grads</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;d&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;m&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;v&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">smooth_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span>
+</span></span></code></pre></div><h5 id="utility-functions">Utility functions</h5>
+<p>Firstly, we will compute the sigmoid activation used at the forget, input and output gate layers, and the softmax activation used at the output layer. Tanh activation is also needed but <em>numpy.tanh</em> is used instead.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">sigmoid</span> <span class="o">=</span> <span class="n">sigmoid</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">softmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">e_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c1"># max(x) subtracted for numerical stability</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">e_x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">softmax</span>
+</span></span></code></pre></div><p>Although exploding gradients is not as prevalent for LSTMs as for RNNs, we will limit the gradients to a conservative value using clip_grads. After backpropagating through all LSTM cells, we will reset the gradients using <em>reset_grads</em>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">clip_grads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">clip_grads</span> <span class="o">=</span> <span class="n">clip_grads</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">reset_grads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">reset_grads</span> <span class="o">=</span> <span class="n">reset_grads</span>
+</span></span></code></pre></div><p>The last utility function that we will create is for updating the weights using Adam. Note that the weights are updated using the accumulated gradients for all time steps.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">update_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_num</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;m&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;m&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta1</span> <span class="o">+</span> \
+</span></span><span class="line"><span class="cl">                                    <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;d&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;v&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;v&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta2</span> <span class="o">+</span> \
+</span></span><span class="line"><span class="cl">                                    <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;d&#34;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">m_correlated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;m&#34;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta1</span><span class="o">**</span><span class="n">batch_num</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v_correlated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adam_params</span><span class="p">[</span><span class="s2">&#34;v&#34;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta2</span><span class="o">**</span><span class="n">batch_num</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">*</span> <span class="n">m_correlated</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_correlated</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">LSTM</span><span class="o">.</span><span class="n">update_params</span> <span class="o">=</span> <span class="n">update_params</span>
+</span></span></code></pre></div><h5 id="forward-propagation-for-a-time-step">Forward propagation for a time-step</h5>
+<p>We will propagate forwards through each LSTM cell using forward_step. The mathematical form of the forward and backward propagation equations can be found in my <a href="/posts/backprop-lstm">previous post</a>.</p>
+<p>A LSTM cell depends on the previous cell’s state (like Neural Networks). forward_step therefore takes as input the previous hidden state ($h_{prev}$) and previous cell state ($c_{prev}$). At the beginning of every training iteration, the previous hidden states are initialised to zero (i.e. at t = -1), but for subsequent time-steps, they correspond to the hidden states at t-1, where t is the current time-step.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">forward_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">((</span><span class="n">h_prev</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wf&#34;</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bf&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wi&#34;</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bi&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wc&#34;</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bc&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">c</span> <span class="o">=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">c_prev</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">c_bar</span>
+</span></span><span class="line"><span class="cl">    <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wo&#34;</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bo&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">h</span> <span class="o">=</span> <span class="n">o</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wv&#34;</span><span class="p">],</span> <span class="n">h</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;bv&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">c_bar</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">z</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">forward_step</span> <span class="o">=</span> <span class="n">forward_step</span>
+</span></span></code></pre></div><h5 id="backward-propagation-for-a-time-step">Backward propagation for a time-step</h5>
+<p>After forward propagation, we will pass the updated values of the last LSTM cell to backward_step and propagate the gradients backwards to the first LSTM cell.</p>
+<p>$dh_{next}$ and $dc_{next}$ are initialised to zero at t = -1, but take the values of $dh_{prev}$ and $dc_{prev}$ that <em>backward_step</em> returns in subsequent time steps.
+In addition, it is worth clarifying:</p>
+<ol>
+<li>As weights are shared by all time steps, the weight gradients are accumulated.</li>
+<li>We are adding $dh_{next}$ to $dh$, because as Figure 1 shows, $h$ is branched in forward propagation in the softmax output layer and the next LSTM cell, where it is concatenated with $x$. Therefore, there are two gradients flowing back. This applies to dc as well.</li>
+<li>There are four gradients flowing towards the input layer from the gates, therefore $dz$ is the summation of those gradients.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">backward_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">dh_next</span><span class="p">,</span> <span class="n">dc_next</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">c_bar</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dv</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span> <span class="c1"># yhat - y</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dWv&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dv</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dbv&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dv</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wv&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dh</span> <span class="o">+=</span> <span class="n">dh_next</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">do</span> <span class="o">=</span> <span class="n">dh</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">da_o</span> <span class="o">=</span> <span class="n">do</span> <span class="o">*</span> <span class="n">o</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">o</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dWo&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">da_o</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dbo&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">da_o</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dc</span> <span class="o">=</span> <span class="n">dh</span> <span class="o">*</span> <span class="n">o</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dc</span> <span class="o">+=</span> <span class="n">dc_next</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dc_bar</span> <span class="o">=</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">i</span>
+</span></span><span class="line"><span class="cl">    <span class="n">da_c</span> <span class="o">=</span> <span class="n">dc_bar</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c_bar</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dWc&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">da_c</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dbc&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">da_c</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">di</span> <span class="o">=</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">c_bar</span>
+</span></span><span class="line"><span class="cl">    <span class="n">da_i</span> <span class="o">=</span> <span class="n">di</span> <span class="o">*</span> <span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dWi&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">da_i</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dbi&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">da_i</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">df</span> <span class="o">=</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">c_prev</span>
+</span></span><span class="line"><span class="cl">    <span class="n">da_f</span> <span class="o">=</span> <span class="n">df</span> <span class="o">*</span> <span class="n">f</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dWf&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">da_f</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">grads</span><span class="p">[</span><span class="s2">&#34;dbf&#34;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">da_f</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dz</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wf&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">da_f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wi&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">da_i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wc&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">da_c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&#34;Wo&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">da_o</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dh_prev</span> <span class="o">=</span> <span class="n">dz</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="p">:]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dc_prev</span> <span class="o">=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">dc</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">dh_prev</span><span class="p">,</span> <span class="n">dc_prev</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">backward_step</span> <span class="o">=</span> <span class="n">backward_step</span>
+</span></span></code></pre></div><h5 id="forward-and-backward-propagation-for-all-time-steps">Forward and backward propagation for all time-steps</h5>
+<p>The forward and backward propagation steps will be executed within the forward_backward function. Here, we iterate over all time steps and store the results for each time step in dictionaries. In the forward propagation loop, we also accumulate the cross entropy loss.</p>
+<p><em>forward_backward</em> exports the cross entropy loss of the training batch, in addition to the hidden and cell states of the last layer which are fed to the first LSTM cell as $h_{prev}$ and prev of the next training batch.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">forward_backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">c_bar</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">o</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">y_hat</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># Values at t= - 1</span>
+</span></span><span class="line"><span class="cl">    <span class="n">h</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_prev</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_prev</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">):</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">x_batch</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">y_hat</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">c_bar</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> \
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">forward_step</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">loss</span> <span class="o">+=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_hat</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">y_batch</span><span class="p">[</span><span class="n">t</span><span class="p">],</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="bp">self</span><span class="o">.</span><span class="n">reset_grads</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dh_next</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dc_next</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dh_next</span><span class="p">,</span> <span class="n">dc_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backward_step</span><span class="p">(</span><span class="n">y_batch</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">y_hat</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">dh_next</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                                              <span class="n">dc_next</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> 
+</span></span><span class="line"><span class="cl">                                              <span class="n">c_bar</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">h</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span></code></pre></div><p>LSTM.forward_backward = forward_backward
+Sampling character sequences
+As training progresses, we will use the sample function to output a sequence of characters from the model, of total length <em>sample_size</em>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">h</span> <span class="o">=</span> <span class="n">h_prev</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c</span> <span class="o">=</span> <span class="n">c_prev</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sample_string</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span> 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_size</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">y_hat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>        
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># get a random index within the probability distribution of y_hat(ravel())</span>
+</span></span><span class="line"><span class="cl">        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">y_hat</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">#find the char with the sampled index and concat to the output string</span>
+</span></span><span class="line"><span class="cl">        <span class="n">char</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_char</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sample_string</span> <span class="o">+=</span> <span class="n">char</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">sample_string</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span>
+</span></span></code></pre></div><h5 id="training">Training</h5>
+<p>Next, we define the function to train the model. train takes as input a corpus of text (X) and outputs a list of losses for each training batch (J) as well as the trained parameters.</p>
+<p>In order to speed up training, we will train our data in batches. The number of batches (<em>num_batches</em>) is given by the total number of characters in the input text (<em>len(X)</em>) divided by the number of characters that we want to use in each batch (<em>seq_len</em>), which is user-defined. The input text goes through the following processing steps:</p>
+<ol>
+<li>Firstly, we trim the characters at end of the input text that don’t form a full sequence</li>
+<li>When we iterate over each training batch, we slice the input text in batches of size <em>seq_len</em></li>
+<li>We map each character in the input (and output) batch to an index, using <em>idx_to_char</em>, effectively converting the input batch to a list of integers</li>
+</ol>
+<p>I have mentioned earlier that h_prev and c_prev are set to zero at the beginning of every training iteration. This means that the states for the samples of each batch will be resused as initial states for the samples in the next batch. Keras, the high-level neural networks API, refers to this as “making the RNN stateful”. If each training batch is independent, then $h_{prev}$ and $c_{prev}$ should be reset after training each batch.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">J</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># to store losses</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">num_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span>
+</span></span><span class="line"><span class="cl">    <span class="n">X_trimmed</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span> <span class="n">num_batches</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">]</span>  <span class="c1"># trim input to have full sequences</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">h_prev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">c_prev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_h</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_trimmed</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># prepare batches</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x_batch</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">char_to_idx</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">X_trimmed</span><span class="p">[</span><span class="n">j</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">y_batch</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">char_to_idx</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">X_trimmed</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">loss</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_backward</span><span class="p">(</span><span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1"># smooth out loss and store in list</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">smooth_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth_loss</span> <span class="o">*</span> <span class="mf">0.999</span> <span class="o">+</span> <span class="n">loss</span> <span class="o">*</span> <span class="mf">0.001</span>
+</span></span><span class="line"><span class="cl">            <span class="n">J</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smooth_loss</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1"># check gradients</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="bp">self</span><span class="o">.</span><span class="n">gradient_check</span><span class="p">(</span><span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">,</span> <span class="n">num_checks</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">clip_grads</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">batch_num</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">+</span> <span class="n">j</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">update_params</span><span class="p">(</span><span class="n">batch_num</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1"># print out loss and sample string</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="n">j</span> <span class="o">%</span> <span class="mi">400000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch:&#39;</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Batch:&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="s2">&#34;-&#34;</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss:&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smooth_loss</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">h_prev</span><span class="p">,</span> <span class="n">c_prev</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">J</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LSTM</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">train</span>
+</span></span></code></pre></div><h5 id="results">Results</h5>
+<p>Finally, we will run the training process for 5 iterations.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">char_to_idx</span><span class="p">,</span> <span class="n">idx_to_char</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">J</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>Epoch: 0 	Batch: 0 - 25 	Loss: 99.72<br>
+Jo!~zyy64 f??0xtnqr7&quot;“jol31irp?a<em>bmm;-efx;vb.;a9:-5l.&lsquo;7v,“a;xk.x6gx(6si8–mqpj</em>jq!udfgymvi“9tbp h!h4ken052cihessw-:5\2\74f~s1pt“9&rsquo;nvx?ysuh0m;,jjn~yu5e48dib3paq&quot;m2z9–56~“7597d
+E!“ qmw0p)gj&rsquo;-x10341-iq:)yv)-dep.:)sy~2*9aj:6?–j&rsquo;dd:78hfl4,y60ya-jntp</p>
+<p>Epoch: 0 	Batch: 400000 - 400025 	Loss: 47.69<br>
+ope at cou&hellip;.</p>
+<p>&ldquo;dove the anased, hermione out on ascowkri weing thee blimesace ind y-u her ceuld you haspill, cilleler for, he tour you not ther ele jatt te you bleat purofed coed a, himsint to gonl. sbangout gotagone cos it hould,&rdquo; siree?&ldquo;in&rsquo;s he.</p>
+<p>Epoch: 1 	Batch: 0 - 25 	Loss: 47.36<br>
+?&rdquo; the muspe the swertery,&quot; harnyound.&quot;</p>
+<p>ait sheer in erey &ndash; in you,?r juven a putced of the bain kem the gould the and ande it kiry stheng u he sarmy to a veingl, you hak was fory.</p>
+<p>&ldquo;wave tay gotnts onte file somione walled to the von! hem ape ea</p>
+<p>Epoch: 1 	Batch: 400000 - 400025 	Loss: 42.05<br>
+antin i marst.</p>
+<p>&ldquo;sny?&rdquo;</p>
+<p>&ldquo;in&rsquo;t woated.</p>
+<p>&quot;&rdquo; havey to leder and reamy doyed to bopreas slop ay?&rdquo; har&rsquo;y and tree tho gosteng bedoning but thap hard anythiont.&quot;. the comes beining bucked to there wilss a lifged a diglt beed. i gusted got carst witsheri</p>
+<p>Epoch: 2 	Batch: 0 - 25 	Loss: 42.32<br>
+on.</p>
+<p>&ldquo;rexursell been them tungerlly dednow, put one a&rsquo;t seaner.</p>
+<p>herriokge, he ston&rsquo;s glinged sely he mught. &ldquo;ye,.&rdquo; bac it, he said just gally, you,&rdquo; said, &ldquo;is ed. the some coired. ic was tookstse,&rdquo;</p>
+<p>and ron,&quot; said screchens: a bryaut of he stall</p>
+<p>Epoch: 2 	Batch: 400000 - 400025 	Loss: 39.16<br>
+uldeding what tears from the dooms fronlaim the one aw thr again. in he piond beate, he&rsquo;piled weellay&rsquo;s fouddout plait,&quot; lelt can&rsquo;t a noich arope-ficling hermoling, and hermione, the wlithing to durglevor evevingses agothere and haw and might of them</p>
+<p>Epoch: 3 	Batch: 0 - 25 	Loss: 39.68<br>
+ay, he cain!&quot; said hagrid magalay&rsquo;s low, and our shunds?&quot; tarng, engon&rsquo;t yooh was them. see &ndash; shat.&quot;</p>
+<p>it weot sift you mased was ears oworeing us i donn.&quot;</p>
+<p>&ldquo;arwuin upcors avely from maying that one. pury. mer quted would to at the coulding tomk am</p>
+<p>Epoch: 3 	Batch: 400000 - 400025 	Loss: 37.28<br>
+ribla gry toued, we maingh the praying they out harry and simptsor streat, neacly sunding up inta tice of the ortepled at hergion grinned you just franteriogess, blioking, but want a firs-&rsquo;s they the coods behind hermione aw they goinging toke.. he s</p>
+<p>Epoch: 4 	Batch: 0 - 25 	Loss: 37.92<br>
+ain, askeds to grow.&rdquo;</p>
+<p>&ldquo;i was a drofey strent for yelle a pupazely unyerseached the steninied, soub, we&rsquo;ll it, but cemsting!&rdquo;</p>
+<p>peeze, cillod, but would suef freens gundes, forlit brood neder high quidey plyfoid me &ndash; more&hellip;, i&rsquo;me gove, in the purs</p>
+<p>Epoch: 4 	Batch: 400000 - 400025 	Loss: 35.93<br>
+wing. &ldquo;she &ndash;&rdquo;</p>
+<p>&ldquo;they dunned. &ldquo;there, poing&rsquo;s nowed him i poents cuddents wils a the trank of snare-aching was what ,&ldquo;drown out of the and going. how exven you a stone of his sayt aborghtaney deat who it wecenes to dight,&rdquo; so mach down she cleaved d
+<!-- raw HTML omitted --></p>
+<hr>
+<p>Although we have just trained our LSTM for a few iterations, it has learnt to correctly spell words like harry and hermione, and how to start dialogue with quotation marks.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">J</span><span class="p">))],</span> <span class="n">J</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&#34;#training iterations&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&#34;training loss&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><figure><img src="images/blog_implementlstm_2.png" width="50%"/>
+</figure>
+
+<h5 id="improvements">Improvements</h5>
+<p>This implementation prioritised simplicity and clarity over performance, thus there are a few enhancements that are worth mentioning:</p>
+<ul>
+<li><strong>Gradient checking</strong>: To check the backpropagation calculation, we can numerically approximate the gradient at a point and compare it to the model’s backprop gradient. Although this was not discussed in this post, it is included in my implementation on GitHub.</li>
+<li><strong>Regularisation</strong>: Large recurrent neural networks tend to overfit the training data. Dropout can be used to generalise results better, however it needs to be applied differently than to feedforward neural networks otherwise performance is not enhanced.</li>
+<li><strong>Gradient clipping</strong>: To prevent exploding gradients, we have clipped their maximum value. This, however, does not improve performance consistently. Rather than clipping each gradient independently, clipping the global norm of the gradient yields more significant improvements.</li>
+<li><strong>Learning the initial state</strong>: We initialised the initial LSTM states to zero.  Instead of fixing the initial state, we can learn it like any other parameter, which can improve performance and is also recommended by Hinton.</li>
+</ul>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2023    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div class="fixed-bar">
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

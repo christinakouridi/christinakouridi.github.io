@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Christina Kouridi">
+    <meta name="description" content="/">
+    <meta name="keywords" content="blog,developer,personal">
+
+    <meta property="og:site_name" content="Christina Kouridi">
+    <meta property="og:title" content="
+  My machine learning research toolkit - Christina Kouridi
+">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/posts/ml-research-toolkit/">
+    <meta property="og:image" content="/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="/posts/ml-research-toolkit/">
+    <meta name="twitter:image" content="/">
+
+    <base href="/posts/ml-research-toolkit/">
+    <title>
+  My machine learning research toolkit - Christina Kouridi
+</title>
+
+    <link rel="canonical" href="/posts/ml-research-toolkit/">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700">
+    <link rel="stylesheet" href="/css/normalize.min.css">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+    
+      <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Christina Kouridi">
+      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Christina Kouridi" />
+    
+
+    <meta name="generator" content="Hugo 0.111.3">
+  </head>
+
+  <body class="">
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">Christina Kouridi</a>
+    <input type="checkbox" id="menu-control"/>
+    <label class="menu-mobile  float-right " for="menu-control">
+      <span class="btn-mobile  float-right ">&#9776;</span>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/about">About</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/posts">Blog</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="/research">Research</a>
+            </li>
+          
+            <li class="navigation-item  align-center ">
+              <a class="navigation-link" href="https://christinakouride.wixsite.com/ckouridi-portfolio">Photography</a>
+            </li>
+          
+        
+        
+      </ul>
+    </label>
+  </section>
+</nav>
+
+
+      <div class="content">
+        
+  <section class="container post">
+  <article>
+    <header>
+      <h1 class="title">My machine learning research toolkit</h1>
+      <h2 class="date">October 31, 2020</h2>
+
+      
+    </header>
+
+    <p>In this post, I will share the key tools in my machine learning research workflow. My selection criteria included free accessibility to students, ease of adoption, active development, and quality of features.</p>
+<h5 id="1-terminal-session-organiser---tmuxhttpsgithubcomtmuxtmuxwiki">1. Terminal session organiser - [<a href="https://github.com/tmux/tmux/wiki">Tmux</a>]</h5>
+<p>Tmux is a terminal multiplexer; it facilitates running and organising sessions on the terminal. Specifically, it enables alternating between several sessions in one terminal, and restoring their state after detachment (i.e. closing the terminal window does not terminate them). Those sessions can be viewed at the same time by splitting the terminal view.</p>
+<figure><img src="images/blog_mltoolkit_1.png" width="90%"/><figcaption>
+            <h4>Figure 1: example tmux session with split terminal view</h4>
+        </figcaption>
+</figure>
+
+<p>A common alternative is Linux’s native <a href="https://linuxize.com/post/how-to-use-linux-screen/">Screen</a>, however it is less user friendly. In addition, screen layouts do not automatically persist.</p>
+<p>An excellent guide on setting up Tmux can be found <a href="https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/">here</a>.</p>
+<hr>
+<h5 id="2-code-development---pycharm-professionalhttpswwwjetbrainscompycharm">2. Code development - [<a href="https://www.jetbrains.com/pycharm/">PyCharm Professional</a>]</h5>
+<p>PyCharm is an engineering marvel, and students get to enjoy the full range of features that comes with its Professional edition for free. Key features include:</p>
+<ul>
+<li>Git integration with the ability to view and review local tracked changes</li>
+<li>remote development with an integrated ssh terminal</li>
+<li>Docker integration</li>
+<li><a href="https://www.jetbrains.com/code-with-me/">Code With Me</a> service for pair programming</li>
+<li>various developer tools, such as built-in terminal, debugger and test runner</li>
+<li>python profiling for speed improvements</li>
+</ul>
+<figure><img src="images/blog_mltoolkit_2.png" width="90%"/><figcaption>
+            <h4>Figure 2: example line profiling in PyCharm</h4>
+        </figcaption>
+</figure>
+
+<hr>
+<h5 id="3-code-organisation---githubhttpsgithubcom">3. Code organisation - [<a href="https://github.com/">GitHub</a>]</h5>
+<p>If you are reading this, you must know that GitHub is THE code platform for version control and collaboration. Beyond these, I have used it extensively to search for code snippets within my code-base — its accuracy has never disappointed me!</p>
+<p>My top tips for utilising it effectively: firstly, using tags to pin and document important commits under the releases page will speed up inspecting and reverting to past code; secondly, write elaborate commit messages (in large collaborative projects that may require paragraphs).</p>
+<p>Students get access to private repositories, which are ideal for storing work-in-progress research.</p>
+<hr>
+<h5 id="4-experiment-tracking---weights--biaseshttpswandbaisite">4. Experiment tracking - [<a href="https://wandb.ai/site">Weights &amp; Biases</a>]</h5>
+<p>This is perhaps one of the least known tools on my list, but the one that has improved my productivity the most. Weights &amp; Biases (or W&amp;B in short) can be used to visualise the results of machine learning experiments (e.g. training curves, OpenAI Gym agent trajectories, matplotlib plots), track metrics and model configurations, and perform parameter sweeps (e.g. grid search, random search, bayesian optimisation). Results can be organised in custom groups and projects, along with the code that generated them.</p>
+<p>Particularly useful is the ability to plot aggregated results, for example the average training curve across multiple random seeds, along with an indication of variation (e.g. min and max bounds, standard deviation or standard error). Plots are almost paper-ready and fairly customisable, but if you want to add just that little bit of matplotlib magic, the exact data points can be exported to a .csv file.</p>
+<figure><img src="images/blog_mltoolkit_3.png" width="95%"/><figcaption>
+            <h4>Figure 3: example aggregated experimental results in Weights &amp; Biases</h4>
+        </figcaption>
+</figure>
+
+<p>Integration couldn’t be easier; only a couple of lines of code are needed in a python script. Luckily, it is also compatible with both PyTorch and TensorFlow.</p>
+<p>A final attractive aspect of Weights &amp; Biases is its highly responsive support team — they are readily available for questions and feature suggestions through live chat.</p>
+<hr>
+<h5 id="5-researchnote-tracking-and-more---notionhttpswwwnotionso">5. Research/note tracking and more - [<a href="https://www.notion.so/">Notion</a>]</h5>
+<p>I have experimented with various note taking apps for research, and life in general. Notion tops my list (with OneNote a close second) due to the power and flexibility of its component system: elements such as images, videos, tables, TeX and code snippets can easily be incorporated on custom pages.</p>
+<p>Another neat feature is the ability to host pages without any of the typical configuration (e.g. a <a href="https://www.notion.so/Agent-Analysis-678a4693229542868f2d526e132df4cd">page</a> that I created to showcase results for a project).</p>
+<figure><img src="images/blog_mltoolkit_4.png" width="95%"/><figcaption>
+            <h4>Figure 4: example Notion page for tracking paper notes</h4>
+        </figcaption>
+</figure>
+
+<p>Although they don’t provide the range of hand-writing features that OneNote does (e.g. hand-written notes on embedding pdfs, search through hand-written notes), Notion is actively developing these much sought-after capabilities (as evident by the recently announced hand-written to digital text conversion using Apple Pencil).</p>
+<hr>
+<h5 id="6-academic-writing---overleafhttpsoverleafcom">6. Academic writing - [<a href="https://overleaf.com">Overleaf</a>]</h5>
+<p>Overleaf is a widely-used LaTeX editor for collaboratively authoring scientific papers. A note of caution — being cloud-based means that you are reliant on internet speed and access; make sure to back-up your work as it is not unheard of for Overleaf to be down for updates close to machine learning conference deadlines.</p>
+
+  </article>
+
+  <br/>
+
+  
+  
+</section>
+
+      </div>
+      
+        <footer class="footer">
+  <section class="container">
+    
+      <div class="sns-shares sp-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+    
+     © 2023    ·  Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/naro143/hugo-coder-portfolio">CoderPortfolio</a>. 
+
+  </section>
+</footer>
+<div class="fixed-bar">
+  <section class="container">
+    
+    
+      <div class="sns-shares pc-sns-shares">
+        
+        
+        
+        
+        
+      </div>
+    
+  </section>
+</div>
+
+      
+    </main>
+
+    
+
+  <script src="/js/app.js"></script>
+  
+  </body>
+</html>

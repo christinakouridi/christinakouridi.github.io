@@ -1,7 +1,6 @@
 Hi there, I'm Christina 👋!
 
-I'm a research engineer based in London, with a particular interest in training machine learning research algorithms at a large-scale, and
-applying them to impactufl real-world applications. 
+I'm a research engineer based in London, with a particular interest in training machine learning research algorithms at large scale, and applying them to impactufl real-world applications. 
 
 Most recently, I contributed to building [DeepPack](https://www.deeppack.ai/) as a research engineer at [InstaDeep](http://instadeep.com). This involved applying reinforcement learning to BinPacking -- an NP-hard combinatorial optimization problem -- in a way that is computationally efficient and generalisable to unseen client data.
 

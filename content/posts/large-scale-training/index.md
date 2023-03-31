@@ -14,6 +14,7 @@ Describes parallelism methods for large-scale training on multiple machines: dat
 The optimal set of techniques depends on the training setting and available hardware. Nonetheless, ZeRO is generally recommended across scenarios (e.g. when the model can fit in memory or not, in single or multi GPU settings). 
 
 ZeRO reduces the memory consumption of each GPU by partitioning model training states (weights, gradients, and optimizer states) across available devices (this is called “sharding”) in the training hardware. It is however less effective on its own in the presence of slow internode connectivity.
+
 ---
 
 ##### "How to Train Really Large Models on Many GPUs?" [[link](https://lilianweng.github.io/posts/2021-09-25-train-large/)]
@@ -30,9 +31,9 @@ This article discusses and demonstrates ways to reduce the memory footprint and 
 
 ##### "Tensor Parallelism with jax.pjit" [[link](https://irhum.github.io/blog/pjit/)]
 
-If you understand things better when you put numbers to them, this article is for you! It provides excellent demonstrations of different ways of applying tensor parallelism to neural network training, and a tutorial on how to implement it for a 15 billion parameter language model in JAX using `pjit`.
+If you understand things better when you put numbers to them, this article is for you! It provides excellent demonstrations of different ways of applying tensor parallelism to neural network training, and a tutorial on how to implement it for a 15 billion parameter language model in JAX using pjit.
 
-`pjit` is generally flexible and simple to use, however figuring out the optimal sharding dimensions needs careful thought to avoid duplicated tensor copies. This is an active development area for JAX, with new tools to distribute and automatically parallelize array computations being frequently released.
+pjit is generally flexible and simple to use, however figuring out the optimal sharding dimensions needs careful thought to avoid duplicated tensor copies. This is an active development area for JAX, with new tools to distribute and automatically parallelize array computations being frequently released.
 
 ---
 ##### "Scalable Training of Language Models using JAX pjit and TPUv4" [[link](https://arxiv.org/pdf/2204.06514.pdf)]

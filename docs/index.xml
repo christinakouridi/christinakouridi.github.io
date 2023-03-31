@@ -119,7 +119,7 @@ Overview: Create an AWS account Launch an EC2 instance via the EC2 dashboard Con
       
       <guid>/about/</guid>
       <description>Hi there, I&amp;rsquo;m Christina 👋!
-I&amp;rsquo;m a research engineer based in London, with a particular interest in training machine learning research algorithms at a large-scale, and applying them to impactufl real-world applications.
+I&amp;rsquo;m a research engineer based in London, with a particular interest in training machine learning research algorithms at large scale, and applying them to impactufl real-world applications.
 Most recently, I contributed to building DeepPack as a research engineer at InstaDeep. This involved applying reinforcement learning to BinPacking &amp;ndash; an NP-hard combinatorial optimization problem &amp;ndash; in a way that is computationally efficient and generalisable to unseen client data.</description>
     </item>
     
