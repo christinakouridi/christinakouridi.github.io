@@ -148,9 +148,11 @@ def njit_hypotenuse(x, y):
     bad_example(df)
     ```
 
+    ```
     0    2  
     1    1  
     Name: even, dtype: int64
+    ```
 
     Although with *@jit* the code runs successfully, *@njit* raises an error.
 
@@ -161,7 +163,7 @@ def njit_hypotenuse(x, y):
 
     bad_example(df)
     ```
-
+    ```
     TypingError                               Traceback (most recent call last)
     <ipython-input-12-63299406f3ac> in <module>()
         3     return x['even']
@@ -202,9 +204,7 @@ def njit_hypotenuse(x, y):
 
     This error may have been caused by the following argument(s):  
     -argument 0: cannot determine Numba type of <class 'pandas.core.frame.DataFrame'>
-
-    ---
-
+    ```
 
     Usually this is not a problem with Numba itself but instead **often caused by the use of unsupported features or an issue in resolving types**. Python/ NumPy features supported by the latest release can be found [here](http://numba.pydata.org/numba-doc/latest/reference/pysupported.html) and [here](http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html). More information on typing errors and how to debug them can be found [here](http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-doesn-t-compile).  
 

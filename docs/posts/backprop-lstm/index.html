@@ -47,6 +47,43 @@
     
 
     <meta name="generator" content="Hugo 0.111.3">
+
+    <style>
+      .equation {
+        border-radius: .3rem;
+        margin: 2rem 0;
+        overflow-x:auto;
+        padding: 1rem 1rem;
+      }
+      .katex-display > .katex {
+        text-align: left !important;
+      }
+    </style>
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
+    
+
   </head>
 
   <body class="">
@@ -104,24 +141,29 @@
         </figcaption>
 </figure>
 
-<p>$\begin{aligned}
-&amp;h_{t-1} \in  \mathbb{R}^{n_{h}}, &amp; \mspace{31mu} x_{t} \in  \mathbb{R}^{n_{x}} \\
-&amp;z_{t}= [h_{t-1}, x_{t}] \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;a_{f}= W_{f}\cdot z_{t} + b_{f},&amp; \mspace{31mu}  f_{t}= \sigma(a_{f}) \\
-&amp;a_{i}= W_{i}\cdot z_{t} + b_{i},&amp; \mspace{40mu}  i_{t}= \sigma(a_{i}) \\
-&amp;a_{o}= W_{o}\cdot z_{t} + b_{o},&amp; \mspace{34mu}  o_{t}= \sigma(a_{o})  \\
-&amp;a_{c}= W_{c}\cdot z_{t} + b_{c},&amp; \mspace{36mu}  \hat{c}_t=  tanh(a_{c}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;{c}_t=  i_{t}\odot \hat{c}_t + f_{t}\odot c_{t-1} \\
-&amp;{h}_t=  o_{t}\odot tanh(c_{t}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;v_{t}= W_{v}\cdot h_{t} + b_{v} \\
-&amp;\hat{y}_t= softmax(v_{t})
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;h\_{t-1} \in  \mathbb{R}^{n\_{h}}, &amp; \hskip{31mu} x\_{t} \in  \mathbb{R}^{n\_{x}} \\\
+&amp;z\_{t}= [h\_{t-1}, x\_{t}] \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;a\_{f}= W\_{f}\cdot z\_{t} &#43; b\_{f},&amp; \hskip{31mu}  f\_{t}= \sigma(a\_{f}) \\\
+&amp;a\_{i}= W\_{i}\cdot z\_{t} &#43; b\_{i},&amp; \hskip{40mu}  i\_{t}= \sigma(a\_{i}) \\\
+&amp;a\_{o}= W\_{o}\cdot z\_{t} &#43; b\_{o},&amp; \hskip{34mu}  o\_{t}= \sigma(a\_{o})  \\\
+&amp;a\_{c}= W\_{c}\cdot z\_{t} &#43; b\_{c},&amp; \hskip{36mu}  \hat{c}\_t=  tanh(a\_{c}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;{c}\_t=  i\_{t}\odot \hat{c}\_t &#43; f\_{t}\odot c\_{t-1} \\\
+&amp;{h}\_t=  o\_{t}\odot tanh(c\_{t}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;v\_{t}= W\_{v}\cdot h\_{t} &#43; b\_{v} \\\
+&amp;\hat{y}\_t= softmax(v\_{t})
+\end{aligned} $$
+  </div>
 <h5 id="backward-propagation">Backward propagation</h5>
 <p>Backpropagation through a LSTM is not as straightforward as through other common Deep Learning architectures, due to the special way its underlying layers interact. Nonetheless, the approach is largely the same; identifying dependencies and recursively applying the chain rule.</p>
 <figure><img src="images/blog_bplstm_2.png" width="80%"/><figcaption>
@@ -131,94 +173,123 @@
 
 <p>Cross-entropy loss with a softmax function are used at the output layer. The standard definition of the derivative of the cross-entropy loss ($\frac{\partial J}{\partial v_{t}}$) is used directly; a detailed derivation can be found here.</p>
 <h5 id="output">Output</h5>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial v_{t}} = \hat{y}_t - y_{t} \\
-&amp;\frac{\partial J}{\partial W_{v}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial W_{v}} \Rightarrow \frac{\partial J}{\partial W_{v}} = \frac{\partial J}{\partial v_{t}} \cdot h_{t}^T \\
-&amp;\frac{\partial J}{\partial b_{v}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial b_{v}} \Rightarrow \frac{\partial J}{\partial b_{v}} = \frac{\partial J}{\partial v_{t}} \end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial v\_{t}} = \hat{y}\_t - y\_{t} \\\
+&amp;\frac{\partial J}{\partial W\_{v}} = \frac{\partial J}{\partial v\_{t}} \cdot \frac{\partial v\_{t}}{\partial W\_{v}} \Rightarrow \frac{\partial J}{\partial W\_{v}} = \frac{\partial J}{\partial v\_{t}} \cdot h\_{t}^T \\\
+&amp;\frac{\partial J}{\partial b\_{v}} = \frac{\partial J}{\partial v\_{t}} \cdot \frac{\partial v\_{t}}{\partial b\_{v}} \Rightarrow \frac{\partial J}{\partial b\_{v}} = \frac{\partial J}{\partial v\_{t}} \end{aligned} $$
+  </div>
 <h5 id="hidden-state">Hidden state</h5>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial h_{t}} = \frac{\partial J}{\partial v_{t}} \cdot \frac{\partial v_{t}}{\partial h_{t}} \Rightarrow \frac{\partial J}{\partial h_{t}} = W_{v}^T \cdot \frac{\partial J}{\partial v_{t}} \\
-&amp;\frac{\partial J}{\partial h_{t}} += \frac{\partial J}{\partial h_{next}}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial h\_{t}} = \frac{\partial J}{\partial v\_{t}} \cdot \frac{\partial v\_{t}}{\partial h\_{t}} \Rightarrow \frac{\partial J}{\partial h\_{t}} = W\_{v}^T \cdot \frac{\partial J}{\partial v\_{t}} \\\
+&amp;\frac{\partial J}{\partial h\_{t}} &#43;= \frac{\partial J}{\partial h\_{next}}
+\end{aligned} $$
+  </div>
 <h5 id="output-gate">Output gate</h5>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial o_{t}} = \frac{\partial J}{\partial h_{t}} \cdot \frac{\partial h_{t}}{\partial o_{t}} \Rightarrow \frac{\partial J}{\partial o_{t}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial o_{t}} \cdot \frac{\partial o_{t}}{\partial a_{o}} \Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot \frac{d(\sigma (a_{o}))}{da_{o}}  \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot \sigma (a_{o})(1- \sigma (a_{o}))  \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{o}} = \frac{\partial J}{\partial h_{t}} \odot tanh(c_{t}) \odot o_{t}(1- o_{t}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial W_{o}} = \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial W_{o}}  \Rightarrow \frac{\partial J}{\partial W_{o}} = \frac{\partial J}{\partial a_{o}} \cdot z_{t}^T \\
-&amp;\frac{\partial J}{\partial b_{o}} = \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial b_{o}} \Rightarrow \frac{\partial J}{\partial b_{o}} = \frac{\partial J}{\partial a_{o}}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial o\_{t}} = \frac{\partial J}{\partial h\_{t}} \cdot \frac{\partial h\_{t}}{\partial o\_{t}} \Rightarrow \frac{\partial J}{\partial o\_{t}} = \frac{\partial J}{\partial h\_{t}} \odot tanh(c\_{t}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial a\_{o}} = \frac{\partial J}{\partial o\_{t}} \cdot \frac{\partial o\_{t}}{\partial a\_{o}} \Rightarrow \frac{\partial J}{\partial a\_{o}} = \frac{\partial J}{\partial h\_{t}} \odot tanh(c\_{t}) \odot \frac{d(\sigma (a\_{o}))}{da\_{o}}  \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{o}} = \frac{\partial J}{\partial h\_{t}} \odot tanh(c\_{t}) \odot \sigma (a\_{o})(1- \sigma (a\_{o}))  \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{o}} = \frac{\partial J}{\partial h\_{t}} \odot tanh(c\_{t}) \odot o\_{t}(1- o\_{t}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial W\_{o}} = \frac{\partial J}{\partial a\_{o}} \cdot \frac{\partial a\_{o}}{\partial W\_{o}}  \Rightarrow \frac{\partial J}{\partial W\_{o}} = \frac{\partial J}{\partial a\_{o}} \cdot z\_{t}^T \\\
+&amp;\frac{\partial J}{\partial b\_{o}} = \frac{\partial J}{\partial a\_{o}} \cdot \frac{\partial a\_{o}}{\partial b\_{o}} \Rightarrow \frac{\partial J}{\partial b\_{o}} = \frac{\partial J}{\partial a\_{o}}
+\end{aligned} $$
+  </div>
 <h5 id="cell-state">Cell state</h5>
-<p>$\begin{aligned}
-\frac{\partial J}{\partial c_{t}} = \frac{\partial J}{\partial h_{t}} \cdot \frac{\partial h_{t}}{\partial c_{t}} \Rightarrow \frac{\partial J}{\partial c_{t}} = \frac{\partial J}{\partial h_{t}} \odot o_{t} \odot (1-tanh(c_{t})^2) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-\frac{\partial J}{\partial c_{t}} += \frac{\partial J}{\partial c_{next}} \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial \hat{c}_t} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial \hat{c}_t} \Rightarrow \frac{\partial J}{\partial \hat{c}_t} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial \hat{c}_t} \cdot \frac{\partial \hat{c}_t}{\partial a_{c}} \Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot \frac{d(tanh(a_{c}))}{da_{c}} \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot (1 - tanh(a_{c})^2) \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{c}} = \frac{\partial J}{\partial c_{t}} \odot i_{t} \odot (1 - \hat{c}_t^2) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial W_{c}} = \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial W_{c}} \Rightarrow \frac{\partial J}{\partial W_{c}} = \frac{\partial J}{\partial a_{c}} \cdot z_{t}^T \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial b_{c}} = \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial b_{c}} \Rightarrow \frac{\partial J}{\partial b_{c}} = \frac{\partial J}{\partial a_{c}}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+\frac{\partial J}{\partial c\_{t}} = \frac{\partial J}{\partial h\_{t}} \cdot \frac{\partial h\_{t}}{\partial c\_{t}} \Rightarrow \frac{\partial J}{\partial c\_{t}} = \frac{\partial J}{\partial h\_{t}} \odot o\_{t} \odot (1-tanh(c\_{t})^2) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+\frac{\partial J}{\partial c\_{t}} &#43;= \frac{\partial J}{\partial c\_{next}} \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial \hat{c}\_t} = \frac{\partial J}{\partial c\_{t}} \cdot \frac{\partial c\_{t}}{\partial \hat{c}\_t} \Rightarrow \frac{\partial J}{\partial \hat{c}\_t} = \frac{\partial J}{\partial c\_{t}} \odot i\_{t} \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial a\_{c}} = \frac{\partial J}{\partial \hat{c}\_t} \cdot \frac{\partial \hat{c}\_t}{\partial a\_{c}} \Rightarrow \frac{\partial J}{\partial a\_{c}} = \frac{\partial J}{\partial c\_{t}} \odot i\_{t} \odot \frac{d(tanh(a\_{c}))}{da\_{c}} \\\
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{c}} = \frac{\partial J}{\partial c\_{t}} \odot i\_{t} \odot (1 - tanh(a\_{c})^2) \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{c}} = \frac{\partial J}{\partial c\_{t}} \odot i\_{t} \odot (1 - \hat{c}\_t^2) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial W\_{c}} = \frac{\partial J}{\partial a\_{c}} \cdot \frac{\partial a\_{c}}{\partial W\_{c}} \Rightarrow \frac{\partial J}{\partial W\_{c}} = \frac{\partial J}{\partial a\_{c}} \cdot z\_{t}^T \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial b\_{c}} = \frac{\partial J}{\partial a\_{c}} \cdot \frac{\partial a\_{c}}{\partial b\_{c}} \Rightarrow \frac{\partial J}{\partial b\_{c}} = \frac{\partial J}{\partial a\_{c}}
+\end{aligned} $$
+  </div>
 <h5 id="input-gate">Input gate</h5>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial i_{t}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial i_{t}} \Rightarrow \frac{\partial J}{\partial i_{t}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial i_{t}} \cdot \frac{\partial i_{t}}{\partial a_{i}} \Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot \frac{d(\sigma (a_{i}))}{da_{i}} \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot \sigma (a_{i})(1- \sigma (a_{i})) \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{i}} = \frac{\partial J}{\partial c_{t}} \odot \hat{c}_t \odot i_{t}(1- i_{t}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial W_{i}} = \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial W_{i}}  \Rightarrow \frac{\partial J}{\partial W_{i}} = \frac{\partial J}{\partial a_{i}} \cdot z_{t}^T \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-\frac{\partial J}{\partial b_{i}} = \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial b_{i}} \Rightarrow \frac{\partial J}{\partial b_{i}} = \frac{\partial J}{\partial a_{i}}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial i\_{t}} = \frac{\partial J}{\partial c\_{t}} \cdot \frac{\partial c\_{t}}{\partial i\_{t}} \Rightarrow \frac{\partial J}{\partial i\_{t}} = \frac{\partial J}{\partial c\_{t}} \odot \hat{c}\_t \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial a\_{i}} = \frac{\partial J}{\partial i\_{t}} \cdot \frac{\partial i\_{t}}{\partial a\_{i}} \Rightarrow \frac{\partial J}{\partial a\_{i}} = \frac{\partial J}{\partial c\_{t}} \odot \hat{c}\_t \odot \frac{d(\sigma (a\_{i}))}{da\_{i}} \\\
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{i}} = \frac{\partial J}{\partial c\_{t}} \odot \hat{c}\_t \odot \sigma (a\_{i})(1- \sigma (a\_{i})) \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{i}} = \frac{\partial J}{\partial c\_{t}} \odot \hat{c}\_t \odot i\_{t}(1- i\_{t}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial W\_{i}} = \frac{\partial J}{\partial a\_{i}} \cdot \frac{\partial a\_{i}}{\partial W\_{i}}  \Rightarrow \frac{\partial J}{\partial W\_{i}} = \frac{\partial J}{\partial a\_{i}} \cdot z\_{t}^T \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+\frac{\partial J}{\partial b\_{i}} = \frac{\partial J}{\partial a\_{i}} \cdot \frac{\partial a\_{i}}{\partial b\_{i}} \Rightarrow \frac{\partial J}{\partial b\_{i}} = \frac{\partial J}{\partial a\_{i}}
+\end{aligned} $$
+  </div>
 <h5 id="forget-gate">Forget gate</h5>
-<p>$\begin{aligned}
-\frac{\partial J}{\partial f_{t}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial f_{t}} \Rightarrow \frac{\partial J}{\partial f_{t}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial f_{t}} \cdot \frac{\partial f_{t}}{\partial a_{f}} \Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot \frac{d(\sigma (a_{f}))}{da_{f}} \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot \sigma (a_{f})(1- \sigma (a_{f}) \\
-&amp;\Rightarrow \frac{\partial J}{\partial a_{f}} = \frac{\partial J}{\partial c_{t}} \odot c_{t-1} \odot f_{t}(1- f_{t}) \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial W_{f}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial W_{f}}  \Rightarrow \frac{\partial J}{\partial W_{f}} = \frac{\partial J}{\partial a_{f}} \cdot z_{t}^T \\
-&amp;\frac{\partial J}{\partial b_{f}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial b_{f}} \Rightarrow \frac{\partial J}{\partial b_{f}} = \frac{\partial J}{\partial a_{f}}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+\frac{\partial J}{\partial f\_{t}} = \frac{\partial J}{\partial c\_{t}} \cdot \frac{\partial c\_{t}}{\partial f\_{t}} \Rightarrow \frac{\partial J}{\partial f\_{t}} = \frac{\partial J}{\partial c\_{t}} \odot c\_{t-1} \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial a\_{f}} = \frac{\partial J}{\partial f\_{t}} \cdot \frac{\partial f\_{t}}{\partial a\_{f}} \Rightarrow \frac{\partial J}{\partial a\_{f}} = \frac{\partial J}{\partial c\_{t}} \odot c\_{t-1} \odot \frac{d(\sigma (a\_{f}))}{da\_{f}} \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{f}} = \frac{\partial J}{\partial c\_{t}} \odot c\_{t-1} \odot \sigma (a\_{f})(1- \sigma (a\_{f}) \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial a\_{f}} = \frac{\partial J}{\partial c\_{t}} \odot c\_{t-1} \odot f\_{t}(1- f\_{t}) \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial W\_{f}} = \frac{\partial J}{\partial a\_{f}} \cdot \frac{\partial a\_{f}}{\partial W\_{f}}  \Rightarrow \frac{\partial J}{\partial W\_{f}} = \frac{\partial J}{\partial a\_{f}} \cdot z\_{t}^T \\\
+&amp;\frac{\partial J}{\partial b\_{f}} = \frac{\partial J}{\partial a\_{f}} \cdot \frac{\partial a\_{f}}{\partial b\_{f}} \Rightarrow \frac{\partial J}{\partial b\_{f}} = \frac{\partial J}{\partial a\_{f}}
+\end{aligned} $$
+  </div>
 <h5 id="input">Input</h5>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial z_{t}} = \frac{\partial J}{\partial a_{f}} \cdot \frac{\partial a_{f}}{\partial z_{t}} + \frac{\partial J}{\partial a_{i}} \cdot \frac{\partial a_{i}}{\partial z_{t}} + \frac{\partial J}{\partial a_{o}} \cdot \frac{\partial a_{o}}{\partial z_{t}} + \frac{\partial J}{\partial a_{c}} \cdot \frac{\partial a_{c}}{\partial z_{t}}  \\
-&amp;\Rightarrow \frac{\partial J}{\partial z_{t}} =  W_{f}^T \cdot \frac{\partial J}{\partial a_{f}} +W_{i}^T \cdot \frac{\partial J}{\partial a_{i}} + W_{o}^T \cdot \frac{\partial J}{\partial a_{o}} + W_{c}^T \cdot \frac{\partial J}{\partial a_{c}} \\
-\end{aligned}$</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial h_{t-1}} = \frac{\partial J}{\partial z_{t}}[:n_{h}, :] \\
-&amp;\frac{\partial J}{\partial c_{t-1}} = \frac{\partial J}{\partial c_{t}} \cdot \frac{\partial c_{t}}{\partial c_{t-1}} \Rightarrow \frac{\partial J}{\partial c_{t-1}} = \frac{\partial J}{\partial c_{t}} \odot f_{t}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial z\_{t}} = \frac{\partial J}{\partial a\_{f}} \cdot \frac{\partial a\_{f}}{\partial z\_{t}} &#43; \frac{\partial J}{\partial a\_{i}} \cdot \frac{\partial a\_{i}}{\partial z\_{t}} &#43; \frac{\partial J}{\partial a\_{o}} \cdot \frac{\partial a\_{o}}{\partial z\_{t}} &#43; \frac{\partial J}{\partial a\_{c}} \cdot \frac{\partial a\_{c}}{\partial z\_{t}}  \\\ 
+&amp;\Rightarrow \frac{\partial J}{\partial z\_{t}} =  W\_{f}^T \cdot \frac{\partial J}{\partial a\_{f}} &#43;W\_{i}^T \cdot \frac{\partial J}{\partial a\_{i}} &#43; W\_{o}^T \cdot \frac{\partial J}{\partial a\_{o}} &#43; W\_{c}^T \cdot \frac{\partial J}{\partial a\_{c}} \\\
+\end{aligned} $$
+
+$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial h\_{t-1}} = \frac{\partial J}{\partial z\_{t}}[:n\_{h}, :] \\\
+&amp;\frac{\partial J}{\partial c\_{t-1}} = \frac{\partial J}{\partial c\_{t}} \cdot \frac{\partial c\_{t}}{\partial c\_{t-1}} \Rightarrow \frac{\partial J}{\partial c\_{t-1}} = \frac{\partial J}{\partial c\_{t}} \odot f\_{t}
+\end{aligned} $$
+  </div>
 <p>The above equations for forward propagation and back propagation will be calculated T times (number of time steps) in each training iteration. At the end of each training iteration, the weights will be updated using the accumulated cost gradient with respect to each weight for all time steps. Assuming Stochastic Gradient Descent, the update equations are the following:</p>
-<p>$\begin{aligned}
-&amp;\frac{\partial J}{\partial W_{f}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{f}^t}, \mspace{31mu} W_{f} += \alpha * \frac{\partial J}{\partial W_{f}} \\
-&amp;\frac{\partial J}{\partial W_{i}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{i}^t}, \mspace{31mu} W_{i} += \alpha * \frac{\partial J}{\partial W_{i}} \\
-&amp;\frac{\partial J}{\partial W_{o}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{o}^t}, \mspace{31mu} W_{o} += \alpha * \frac{\partial J}{\partial W_{o}} \\
-&amp;\frac{\partial J}{\partial W_{c}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{c}^t}, \mspace{31mu} W_{c} += \alpha * \frac{\partial J}{\partial W_{c}} \\
-&amp;\frac{\partial J}{\partial W_{v}} = \sum\limits_{t}^T \frac{\partial J}{\partial W_{v}^t}, \mspace{31mu} W_{v} += \alpha * \frac{\partial J}{\partial W_{v}} \\
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+&amp;\frac{\partial J}{\partial W\_{f}} = \sum\limits\_{t}^T \frac{\partial J}{\partial W\_{f}^t}, \hskip{31mu} W\_{f} &#43;= \alpha * \frac{\partial J}{\partial W\_{f}} \\\
+&amp;\frac{\partial J}{\partial W\_{i}} = \sum\limits\_{t}^T \frac{\partial J}{\partial W\_{i}^t}, \hskip{31mu} W\_{i} &#43;= \alpha * \frac{\partial J}{\partial W\_{i}} \\\
+&amp;\frac{\partial J}{\partial W\_{o}} = \sum\limits\_{t}^T \frac{\partial J}{\partial W\_{o}^t}, \hskip{31mu} W\_{o} &#43;= \alpha * \frac{\partial J}{\partial W\_{o}} \\\
+&amp;\frac{\partial J}{\partial W\_{c}} = \sum\limits\_{t}^T \frac{\partial J}{\partial W\_{c}^t}, \hskip{31mu} W\_{c} &#43;= \alpha * \frac{\partial J}{\partial W\_{c}} \\\
+&amp;\frac{\partial J}{\partial W\_{v}} = \sum\limits\_{t}^T \frac{\partial J}{\partial W\_{v}^t}, \hskip{31mu} W\_{v} &#43;= \alpha * \frac{\partial J}{\partial W\_{v}} \\\
+\end{aligned} $$
+  </div>
 <p>In the <a href="/posts/implement-lstm">next post</a>, we will implement the above equations using Numpy and train the resulting LSTM model on real data.</p>
 
   </article>

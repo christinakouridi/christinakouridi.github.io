@@ -47,6 +47,43 @@
     
 
     <meta name="generator" content="Hugo 0.111.3">
+
+    <style>
+      .equation {
+        border-radius: .3rem;
+        margin: 2rem 0;
+        overflow-x:auto;
+        padding: 1rem 1rem;
+      }
+      .katex-display > .katex {
+        text-align: left !important;
+      }
+    </style>
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
+    
+
   </head>
 
   <body class="">
@@ -105,35 +142,47 @@
 </ol>
 <h5 id="adversarial-training-procedure">Adversarial training procedure</h5>
 <p>In stochastic optimisation, the aim is to minimise an expected loss: $\mathbf{E}_{P_0} \left[ \ell(\theta; Z) \right]$ over a parameter $\theta \in \Theta$, for a training distirbution $Z \sim P_0$. In distributionally robust optimisation, the aim is to minimise the following:</p>
-<p>$\begin{aligned}
+
+  <div class="equation">$$ \begin{aligned}
 (1) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \hspace{0.1cm} \underset{P \in \mathcal{P}}{\text{sup }} \hspace{0.1cm} \mathbf{E}_{P}[\ell(\theta ; Z)]
-\end{aligned}$</p>
+\end{aligned} $$
+  </div>
 <p>where $\mathcal{P}$ is a postulated class of distributions around the data-generating distribution $P_0$. $\mathcal{P}$ influences robustness guarantees and computability. <strong>This work considers the robustness region defined by Wassertedin-based uncertainty sets</strong> $\mathcal{P} = \{ P: W_c(P, P_0) \leq \rho \}$, where $\rho$ defines the neighborhood around $P_0$, and $c$ is the “cost” for an adversary to perturbe $z_0$ to $z$ (the authors typically use $c(z, z_0) = || z - z_0||_{p}^{2}$ with $p \geq 1$ and set $p=2$ in their experiments).</p>
 <p><strong>As solving the min-max problem (1) is analytically intractable for deep learning and other complex models for arbitrary $\rho$, the authors reformulate it using a Lagrangian relaxation with a fixed penalty paramter $\gamma \geq 0$</strong>:</p>
-<p>$\begin{aligned}
-(2a) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }}  \{{ F(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} { \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W_{c}\left(P, P_{0}\right)}=\mathbf{E}_{P}[\phi_{\gamma}(\theta ; Z)]} \}
-\end{aligned}$</p>
-<p>$\begin{aligned}
+
+  <div class="equation">$$ \begin{aligned}
+(2a) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }}  \\{\{ F(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} \{ \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W\_{c}\left(P, P\_{0}\right)\}=\mathbf{E}\_{P}[\phi\_{\gamma}(\theta ; Z)]\} \\}
+\end{aligned} $$
+
+$$ \begin{aligned}
 (2b) \hspace{0.8cm}  \phi_{\gamma}\left(\theta ; z_{0}\right):=\underset{z \in \mathcal{Z}}{\text{sup}} \hspace{0.3cm} {\ell(\theta;z) - \gamma c(z,z_0)}
-\end{aligned}$</p>
+\end{aligned} $$
+  </div>
 <p>the usual loss $\ell$ has been replaced by the robust surrogate $\phi_\gamma$, which allows for adversarial perturbations z, modulated by the penalty $\gamma$. As $P_0$ is unknown, the penalty problem (2) is solved with the empirical distribution $\hat{P}_n$:</p>
-<p>$\begin{aligned}
-(3) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \{ { F_{n}(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} { \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W_{c}(P, \hat{P}_{n})}=\mathbf{E}_{\hat{P}_{n}}[\phi_{\gamma}(\theta ; Z)]} \}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+(3) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \\{ \{ F\_{n}(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} \{ \mathbf{E}\_{P}[\ell(\theta ; Z)]-\gamma W\_{c}(P, \hat{P}\_{n})\}=\mathbf{E}\_{\hat{P}\_{n}}[\phi_{\gamma}(\theta ; Z)]\} \\}
+\end{aligned} $$
+  </div>
 <p>As we will discuss later on, <strong>the reformulated objective ensures that moderate levels of robustness against adversarial perturbations are achievable at no computational or statistical cost for smooth losses $\ell$</strong>. This utilises the key insight that <strong>for large enough penalty $\gamma$ (by duality, small enough robustness $\rho$), the robust surrogate function $\phi_\gamma = \ell(\theta;z) - \gamma c(z, z_0)$ in (2b) is strongly concave and hence easy to optimise if $\ell(\theta;z)$ is smooth in $z$</strong>. This implies that stochastic gradient methods applied to (2) have similar convergence guarantees as for non-robust methods.</p>
 <p>By inspection, we can obtain that for <strong>large $\gamma$, the term $-\gamma c(z, z_0)$ dominates. If $c(z, z_0)$ is designed to be strongly convex, then $-c(z, z_0)$ and $\phi_{\gamma}$ would be strongly concave</strong>. More formally, this key insight relies on the assumptions that the cost $c$ is <em>1-strong concave</em> and that the loss $\ell(\theta; \dot)$ is smooth such that there is some $L$ for which $\nabla_{z} \ell(\theta; \dot)$ is <em>L-Lipschitz</em>. The former gives a bound for <em>c</em>, and the latter along with a taylor series expansion of $\ell(\theta; z&rsquo;)$ around $z’=z$, a bound for $L$. Combining them results in:</p>
-<p>$\begin{aligned}
-(4) \hspace{0.8cm} \ell\left(\theta ; z^{\prime}\right)-\gamma c\left(z^{\prime}, z_{0}\right) \leq \ \ell(\theta ; z)-\gamma c\left(z, z_{0}\right)+\left\langle\nabla_{z}\left(\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\right), z^{\prime}-z\right\rangle+\frac{L-\gamma}{2}\left|z-z^{\prime}\right|_{2}^{2}
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+ (4) \hspace{0.8cm} \ell\left(\theta ; z^{\prime}\right)-\gamma c\left(z^{\prime}, z_{0}\right) \leq \\ \ell(\theta ; z)-\gamma c\left(z, z_{0}\right)&#43;\left\langle\nabla_{z}\left(\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\right), z^{\prime}-z\right\rangle&#43;\frac{L-\gamma}{2}\left|z-z^{\prime}\right|_{2}^{2}
+\end{aligned} $$
+  </div>
 <p>The last term makes use of the property $| \nabla_z \ell | \leq L$, and that $c$ is twice differentiable. For $\gamma \geq L$ i.e. (negative $L - \gamma$), (4) gives us the first-order condition for ($\gamma  - L$)-strong concativity of $z \rightarrow (\ell(\theta; \dot) - \gamma c(z, z_0))$. To reiterate, <strong>when the loss is smooth enough in $z$ and the penalty $\gamma$ is large enough (corresponding to less robustness), computing the surrogate (2b) is a strongly-concave optimisation problem</strong>.</p>
 <h5 id="computational-guarantees">Computational guarantees</h5>
 <p><strong>Formulation (4) relaxes the requirement for a prescribed amount of robustness $\rho$, and instead focuses on the Lagrangian penalty formulation (3)</strong>. The authors develop a stochastic gradient descent (SGD) procedure to optimise it, motivated by the observation:</p>
-<p>$\begin{aligned}
+
+  <div class="equation">$$ \begin{aligned}
 (5a) \hspace{0.8cm} \nabla_{\theta} \phi_{\gamma}\left(\theta ; z_{0}\right)=\nabla_{\theta} \ell\left(\theta ; z^{\star}\left(z_{0}, \theta\right)\right) \hspace{0.2cm}
-\end{aligned}$</p>
-<p>$\begin{aligned}
-(5b) \hspace{0.8cm} z^{\star}\left(z_{0}, \theta\right)=\underset{z \in \mathcal{Z}}{\text{argmax }} \{\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\}
-\end{aligned}$</p>
+\end{aligned} $$
+
+$$ \begin{aligned}
+(5b) \hspace{0.8cm} z^{\star}\left(z_{0}, \theta\right)=\underset{z \in \mathcal{Z}}{\text{argmax }} \\{\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\\}
+\end{aligned} $$
+  </div>
 <p>which is met under two assumptions:</p>
 <ul>
 <li><strong>the cost function $c(z, z_0)$ is continuous and l-strongly convex</strong> (e.g. $|| z - z_0||^{2}_{2}$)</li>

@@ -2,7 +2,6 @@
 title: "'Certifying Some Distributional Robustness with Principled Adversarial Training'"
 date: 2020-10-27
 draft: false
-math: true
 ---
 
 In this post I will provide a brief overview of the paper **[“Certifying Some Distributional Robustness with Principled Adversarial Training”](https://arxiv.org/pdf/1710.10571.pdf)**. It assumes good knowledge of [stochastic optimisation](https://www.youtube.com/watch?v=0MeNygohD6c) and [adversarial robustness](https://adversarial-ml-tutorial.org/). This work is a positive step towards training neural networks that are robust to small perturbations of their inputs, which may stem from adversarial attacks.
@@ -20,36 +19,43 @@ This work makes two key contributions:
 
 In stochastic optimisation, the aim is to minimise an expected loss: $\mathbf{E}_{P_0} \left[ \ell(\theta; Z) \right]$ over a parameter $\theta \in \Theta$, for a training distirbution $Z \sim P_0$. In distributionally robust optimisation, the aim is to minimise the following:
 
-$\begin{aligned}
+```katex
+$$ \begin{aligned}
 (1) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \hspace{0.1cm} \underset{P \in \mathcal{P}}{\text{sup }} \hspace{0.1cm} \mathbf{E}_{P}[\ell(\theta ; Z)]
-\end{aligned}$
+\end{aligned} $$
+```
 
 where $\mathcal{P}$ is a postulated class of distributions around the data-generating distribution $P_0$. $\mathcal{P}$ influences robustness guarantees and computability. **This work considers the robustness region defined by Wassertedin-based uncertainty sets** $\mathcal{P} = \\{ P: W_c(P, P_0) \leq \rho \\}$, where $\rho$ defines the neighborhood around $P_0$, and $c$ is the “cost” for an adversary to perturbe $z_0$ to $z$ (the authors typically use $c(z, z_0) = || z - z_0||_{p}^{2}$ with $p \geq 1$ and set $p=2$ in their experiments).
 
 **As solving the min-max problem (1) is analytically intractable for deep learning and other complex models for arbitrary $\rho$, the authors reformulate it using a Lagrangian relaxation with a fixed penalty paramter $\gamma \geq 0$**:
 
-$\begin{aligned}
+```katex
+$$ \begin{aligned}
 (2a) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }}  \\{\{ F(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} \{ \mathbf{E}_{P}[\ell(\theta ; Z)]-\gamma W\_{c}\left(P, P\_{0}\right)\}=\mathbf{E}\_{P}[\phi\_{\gamma}(\theta ; Z)]\} \\}
-\end{aligned}$
+\end{aligned} $$
 
-$\begin{aligned}
+$$ \begin{aligned}
 (2b) \hspace{0.8cm}  \phi_{\gamma}\left(\theta ; z_{0}\right):=\underset{z \in \mathcal{Z}}{\text{sup}} \hspace{0.3cm} {\ell(\theta;z) - \gamma c(z,z_0)}
-\end{aligned}$
+\end{aligned} $$
+```
 
 the usual loss $\ell$ has been replaced by the robust surrogate $\phi_\gamma$, which allows for adversarial perturbations z, modulated by the penalty $\gamma$. As $P_0$ is unknown, the penalty problem (2) is solved with the empirical distribution $\hat{P}_n$:
 
-$\begin{aligned}
+```katex
+$$ \begin{aligned}
 (3) \hspace{0.8cm} \underset{\theta \in \Theta}{\text{minimise }} \\{ \{ F\_{n}(\theta):= \underset{P \in \mathcal{P}}{\text{sup }} \{ \mathbf{E}\_{P}[\ell(\theta ; Z)]-\gamma W\_{c}(P, \hat{P}\_{n})\}=\mathbf{E}\_{\hat{P}\_{n}}[\phi_{\gamma}(\theta ; Z)]\} \\}
-\end{aligned}$
+\end{aligned} $$
+```
 
 As we will discuss later on, **the reformulated objective ensures that moderate levels of robustness against adversarial perturbations are achievable at no computational or statistical cost for smooth losses $\ell$**. This utilises the key insight that **for large enough penalty $\gamma$ (by duality, small enough robustness $\rho$), the robust surrogate function $\phi_\gamma = \ell(\theta;z) - \gamma c(z, z_0)$ in (2b) is strongly concave and hence easy to optimise if $\ell(\theta;z)$ is smooth in $z$**. This implies that stochastic gradient methods applied to (2) have similar convergence guarantees as for non-robust methods.
 
 By inspection, we can obtain that for **large $\gamma$, the term $-\gamma c(z, z_0)$ dominates. If $c(z, z_0)$ is designed to be strongly convex, then $-c(z, z_0)$ and $\phi_{\gamma}$ would be strongly concave**. More formally, this key insight relies on the assumptions that the cost $c$ is *1-strong concave* and that the loss $\ell(\theta; \dot)$ is smooth such that there is some $L$ for which $\nabla_{z} \ell(\theta; \dot)$ is *L-Lipschitz*. The former gives a bound for *c*, and the latter along with a taylor series expansion of $\ell(\theta; z')$ around $z’=z$, a bound for $L$. Combining them results in:
 
-
-$\begin{aligned}
+```katex
+$$ \begin{aligned}
  (4) \hspace{0.8cm} \ell\left(\theta ; z^{\prime}\right)-\gamma c\left(z^{\prime}, z_{0}\right) \leq \\ \ell(\theta ; z)-\gamma c\left(z, z_{0}\right)+\left\langle\nabla_{z}\left(\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\right), z^{\prime}-z\right\rangle+\frac{L-\gamma}{2}\left|z-z^{\prime}\right|_{2}^{2}
-\end{aligned}$
+\end{aligned} $$
+```
 
 The last term makes use of the property $| \nabla_z \ell | \leq L$, and that $c$ is twice differentiable. For $\gamma \geq L$ i.e. (negative $L - \gamma$), (4) gives us the first-order condition for ($\gamma  - L$)-strong concativity of $z \rightarrow (\ell(\theta; \dot) - \gamma c(z, z_0))$. To reiterate, **when the loss is smooth enough in $z$ and the penalty $\gamma$ is large enough (corresponding to less robustness), computing the surrogate (2b) is a strongly-concave optimisation problem**.
 
@@ -57,13 +63,15 @@ The last term makes use of the property $| \nabla_z \ell | \leq L$, and that $c$
 
 **Formulation (4) relaxes the requirement for a prescribed amount of robustness $\rho$, and instead focuses on the Lagrangian penalty formulation (3)**. The authors develop a stochastic gradient descent (SGD) procedure to optimise it, motivated by the observation:
 
-$\begin{aligned}
+```katex
+$$ \begin{aligned}
 (5a) \hspace{0.8cm} \nabla_{\theta} \phi_{\gamma}\left(\theta ; z_{0}\right)=\nabla_{\theta} \ell\left(\theta ; z^{\star}\left(z_{0}, \theta\right)\right) \hspace{0.2cm}
-\end{aligned}$
+\end{aligned} $$
 
-$\begin{aligned}
+$$ \begin{aligned}
 (5b) \hspace{0.8cm} z^{\star}\left(z_{0}, \theta\right)=\underset{z \in \mathcal{Z}}{\text{argmax }} \\{\ell(\theta ; z)-\gamma c\left(z, z_{0}\right)\\}
-\end{aligned}$
+\end{aligned} $$
+```
 
 which is met under two assumptions:
 

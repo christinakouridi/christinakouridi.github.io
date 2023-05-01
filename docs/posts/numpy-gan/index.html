@@ -47,6 +47,43 @@
     
 
     <meta name="generator" content="Hugo 0.111.3">
+
+    <style>
+      .equation {
+        border-radius: .3rem;
+        margin: 2rem 0;
+        overflow-x:auto;
+        padding: 1rem 1rem;
+      }
+      .katex-display > .katex {
+        text-align: left !important;
+      }
+    </style>
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
+    
+
   </head>
 
   <body class="">
@@ -143,24 +180,34 @@
 <ol>
 <li>
 <p><strong>Training $D$ to maximise the probability of assigning the correct label to the training examples</strong>, $D(x)$ and samples from the generator, $D(G(z))$. The discriminator therefore wants to maximise:</p>
-<p>$\begin{aligned}
-J^{(D)} = \mathbb{E}_{x \sim p_{data}(x)}logD(x) + \mathbb{E}_{z \sim p_{z}(z)}log(1-D(G(z))
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+J^{(D)} = \mathbb{E}\_{x \sim p\_{data}(x)}logD(x) &#43; \mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z))
+\end{aligned} $$
+  </div>
 <p>where $p_{data}$ is the training data distribution and $p_{z}$ the noise prior. This is equivalent to minimising:</p>
-<p>$\begin{aligned}
-J^{(D)} = -\mathbb{E}_{x \sim p_{data}(x)}logD(x) -\mathbb{E}_{z \sim p_{z}(z)}log(1-D(G(z))
-\end{aligned}$</p>
-<p>This is just the <strong>standard cross-entropy cost that is minimised when training a binary classifier with a sigmoid output</strong>. The only difference is that <strong>the classifier is trained on two mini-batches of data</strong>; one coming from the dataset, where the label is 1 for all examples, and one coming from the generator, where the label is 0 for all examples.</p>
+
+  <div class="equation">$$ \begin{aligned}
+J^{(D)} = -\mathbb{E}\_{x \sim p\_{data}(x)}logD(x) -\mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z))
+\end{aligned} $$
+  </div>
 </li>
+</ol>
+<p>This is just the <strong>standard cross-entropy cost that is minimised when training a binary classifier with a sigmoid output</strong>. The only difference is that <strong>the classifier is trained on two mini-batches of data</strong>; one coming from the dataset, where the label is 1 for all examples, and one coming from the generator, where the label is 0 for all examples.</p>
+<ol start="2">
 <li>
 <p><strong>Training $G$ to minimise the likelihood of the generated images not coming from the real data distribution</strong>. In other words, $G$ is trying to maximally confuse the discriminator. It tries to minimise:</p>
-<p>$\begin{aligned}
-J^{(G)} = \mathbb{E}_{z \sim p_{z}(z)}log(1-D(G(z)))
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+J^{(G)} = \mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z)))
+\end{aligned} $$
+  </div>
 <p>Typically, an alternative, non-saturating training criterion is used for the generator:</p>
-<p>$\begin{aligned}
-J^{(G)} = -\mathbb{E}_{z \sim p_{z}(z)}log(D(G(z))
-\end{aligned}$</p>
+
+  <div class="equation">$$ \begin{aligned}
+J^{(G)} = -\mathbb{E}\_{z \sim p\_{z}(z)}log(D(G(z))
+\end{aligned} $$
+  </div>
 </li>
 </ol>
 <h4 id="implementation">Implementation</h4>
@@ -179,9 +226,9 @@ J^{(G)} = -\mathbb{E}_{z \sim p_{z}(z)}log(D(G(z))
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;y_train.shape&#34;</span><span class="p">,</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;x_train.shape&#34;</span><span class="p">,</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</span></span></code></pre></div><p>y_train.shape (60000,)<br>
-x_train.shape (60000, 28, 28)</p>
-<h5 id="initialisation">Initialisation</h5>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">y_train.shape (60000,)  
+</span></span><span class="line"><span class="cl">x_train.shape (60000, 28, 28)
+</span></span></code></pre></div><h5 id="initialisation">Initialisation</h5>
 <p>We will wrap all functions in the GAN class.</p>
 <p>On one GPU, a GAN will need hours to train, and on one CPU more than a day. In addition, GANs are difficult to optimise. For these reasons, <strong>I recommend trying to generate one digit at a time, by limiting the training data from the digits 0-9 to the digit specified in the numbers list</strong>.</p>
 <p>We will use a mini-batch size of 64 (batch_size). The input layer of the discriminator is determined by the size of the training images <em>[batch_size, image dimension^2]</em>, which needs to match the output of the generator, i.e. the fake images. The number of neurons at the input layer of the generator (<em>input_layer_size_g</em>) as well as the hidden layers of both models (<em>hidden_layer_size_g, hidden_layer_size_d</em>) need to be defined by us.</p>

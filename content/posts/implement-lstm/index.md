@@ -358,8 +358,7 @@ model = LSTM(char_to_idx, idx_to_char, vocab_size, epochs = 5, lr = 0.01)
 J, params = model.train(data)
 ```
 
-<code>
-
+```
 Epoch: 0 	Batch: 0 - 25 	Loss: 99.72  
 Jo!~zyy64 f??0xtnqr7"“jol31irp?a*bmm;-efx;vb.;a9:-5l.'7v,“a;xk.x6gx(6si8–mqpj*jq!udfgymvi“9tbp h!h4ken052cihessw-:5\2\74f~s1pt“9'nvx?ysuh0m;,jjn~yu5e48dib3paq"m2z9–56~“7597d 
 E!“ qmw0p)gj'-x10341-iq:)yv)-dep.:)sy~2*9aj:6?–j'dd:78hfl4,y60ya-jntp 
@@ -418,7 +417,7 @@ Epoch: 4 	Batch: 400000 - 400025 	Loss: 35.93
 wing. "she --" 
 
 "they dunned. "there, poing's nowed him i poents cuddents wils a the trank of snare-aching was what ,"drown out of the and going. how exven you a stone of his sayt aborghtaney deat who it wecenes to dight," so mach down she cleaved d 
-</code>
+```
 
 --- 
 Although we have just trained our LSTM for a few iterations, it has learnt to correctly spell words like harry and hermione, and how to start dialogue with quotation marks.

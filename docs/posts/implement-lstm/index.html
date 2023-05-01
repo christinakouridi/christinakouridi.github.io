@@ -47,6 +47,22 @@
     
 
     <meta name="generator" content="Hugo 0.111.3">
+
+    <style>
+      .equation {
+        border-radius: .3rem;
+        margin: 2rem 0;
+        overflow-x:auto;
+        padding: 1rem 1rem;
+      }
+      .katex-display > .katex {
+        text-align: left !important;
+      }
+    </style>
+  
+    
+    
+
   </head>
 
   <body class="">
@@ -389,44 +405,65 @@ As training progresses, we will use the sample function to output a sequence of 
 <p>Finally, we will run the training process for 5 iterations.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">char_to_idx</span><span class="p">,</span> <span class="n">idx_to_char</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">J</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span></span></code></pre></div><!-- raw HTML omitted -->
-<p>Epoch: 0 	Batch: 0 - 25 	Loss: 99.72<br>
-Jo!~zyy64 f??0xtnqr7&quot;“jol31irp?a<em>bmm;-efx;vb.;a9:-5l.&lsquo;7v,“a;xk.x6gx(6si8–mqpj</em>jq!udfgymvi“9tbp h!h4ken052cihessw-:5\2\74f~s1pt“9&rsquo;nvx?ysuh0m;,jjn~yu5e48dib3paq&quot;m2z9–56~“7597d
-E!“ qmw0p)gj&rsquo;-x10341-iq:)yv)-dep.:)sy~2*9aj:6?–j&rsquo;dd:78hfl4,y60ya-jntp</p>
-<p>Epoch: 0 	Batch: 400000 - 400025 	Loss: 47.69<br>
-ope at cou&hellip;.</p>
-<p>&ldquo;dove the anased, hermione out on ascowkri weing thee blimesace ind y-u her ceuld you haspill, cilleler for, he tour you not ther ele jatt te you bleat purofed coed a, himsint to gonl. sbangout gotagone cos it hould,&rdquo; siree?&ldquo;in&rsquo;s he.</p>
-<p>Epoch: 1 	Batch: 0 - 25 	Loss: 47.36<br>
-?&rdquo; the muspe the swertery,&quot; harnyound.&quot;</p>
-<p>ait sheer in erey &ndash; in you,?r juven a putced of the bain kem the gould the and ande it kiry stheng u he sarmy to a veingl, you hak was fory.</p>
-<p>&ldquo;wave tay gotnts onte file somione walled to the von! hem ape ea</p>
-<p>Epoch: 1 	Batch: 400000 - 400025 	Loss: 42.05<br>
-antin i marst.</p>
-<p>&ldquo;sny?&rdquo;</p>
-<p>&ldquo;in&rsquo;t woated.</p>
-<p>&quot;&rdquo; havey to leder and reamy doyed to bopreas slop ay?&rdquo; har&rsquo;y and tree tho gosteng bedoning but thap hard anythiont.&quot;. the comes beining bucked to there wilss a lifged a diglt beed. i gusted got carst witsheri</p>
-<p>Epoch: 2 	Batch: 0 - 25 	Loss: 42.32<br>
-on.</p>
-<p>&ldquo;rexursell been them tungerlly dednow, put one a&rsquo;t seaner.</p>
-<p>herriokge, he ston&rsquo;s glinged sely he mught. &ldquo;ye,.&rdquo; bac it, he said just gally, you,&rdquo; said, &ldquo;is ed. the some coired. ic was tookstse,&rdquo;</p>
-<p>and ron,&quot; said screchens: a bryaut of he stall</p>
-<p>Epoch: 2 	Batch: 400000 - 400025 	Loss: 39.16<br>
-uldeding what tears from the dooms fronlaim the one aw thr again. in he piond beate, he&rsquo;piled weellay&rsquo;s fouddout plait,&quot; lelt can&rsquo;t a noich arope-ficling hermoling, and hermione, the wlithing to durglevor evevingses agothere and haw and might of them</p>
-<p>Epoch: 3 	Batch: 0 - 25 	Loss: 39.68<br>
-ay, he cain!&quot; said hagrid magalay&rsquo;s low, and our shunds?&quot; tarng, engon&rsquo;t yooh was them. see &ndash; shat.&quot;</p>
-<p>it weot sift you mased was ears oworeing us i donn.&quot;</p>
-<p>&ldquo;arwuin upcors avely from maying that one. pury. mer quted would to at the coulding tomk am</p>
-<p>Epoch: 3 	Batch: 400000 - 400025 	Loss: 37.28<br>
-ribla gry toued, we maingh the praying they out harry and simptsor streat, neacly sunding up inta tice of the ortepled at hergion grinned you just franteriogess, blioking, but want a firs-&rsquo;s they the coods behind hermione aw they goinging toke.. he s</p>
-<p>Epoch: 4 	Batch: 0 - 25 	Loss: 37.92<br>
-ain, askeds to grow.&rdquo;</p>
-<p>&ldquo;i was a drofey strent for yelle a pupazely unyerseached the steninied, soub, we&rsquo;ll it, but cemsting!&rdquo;</p>
-<p>peeze, cillod, but would suef freens gundes, forlit brood neder high quidey plyfoid me &ndash; more&hellip;, i&rsquo;me gove, in the purs</p>
-<p>Epoch: 4 	Batch: 400000 - 400025 	Loss: 35.93<br>
-wing. &ldquo;she &ndash;&rdquo;</p>
-<p>&ldquo;they dunned. &ldquo;there, poing&rsquo;s nowed him i poents cuddents wils a the trank of snare-aching was what ,&ldquo;drown out of the and going. how exven you a stone of his sayt aborghtaney deat who it wecenes to dight,&rdquo; so mach down she cleaved d
-<!-- raw HTML omitted --></p>
-<hr>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Epoch: 0 	Batch: 0 - 25 	Loss: 99.72  
+</span></span><span class="line"><span class="cl">Jo!~zyy64 f??0xtnqr7&#34;“jol31irp?a*bmm;-efx;vb.;a9:-5l.&#39;7v,“a;xk.x6gx(6si8–mqpj*jq!udfgymvi“9tbp h!h4ken052cihessw-:5\2\74f~s1pt“9&#39;nvx?ysuh0m;,jjn~yu5e48dib3paq&#34;m2z9–56~“7597d 
+</span></span><span class="line"><span class="cl">E!“ qmw0p)gj&#39;-x10341-iq:)yv)-dep.:)sy~2*9aj:6?–j&#39;dd:78hfl4,y60ya-jntp 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 0 	Batch: 400000 - 400025 	Loss: 47.69  
+</span></span><span class="line"><span class="cl">ope at cou.... 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;dove the anased, hermione out on ascowkri weing thee blimesace ind y-u her ceuld you haspill, cilleler for, he tour you not ther ele jatt te you bleat purofed coed a, himsint to gonl. sbangout gotagone cos it hould,&#34; siree?&#34;in&#39;s he. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 1 	Batch: 0 - 25 	Loss: 47.36  
+</span></span><span class="line"><span class="cl">?&#34; the muspe the swertery,&#34; harnyound.&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ait sheer in erey -- in you,?r juven a putced of the bain kem the gould the and ande it kiry stheng u he sarmy to a veingl, you hak was fory. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;wave tay gotnts onte file somione walled to the von! hem ape ea 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 1 	Batch: 400000 - 400025 	Loss: 42.05  
+</span></span><span class="line"><span class="cl">antin i marst. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;sny?&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;in&#39;t woated. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;&#34; havey to leder and reamy doyed to bopreas slop ay?&#34; har&#39;y and tree tho gosteng bedoning but thap hard anythiont.&#34;. the comes beining bucked to there wilss a lifged a diglt beed. i gusted got carst witsheri 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 2 	Batch: 0 - 25 	Loss: 42.32  
+</span></span><span class="line"><span class="cl"> on. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;rexursell been them tungerlly dednow, put one a&#39;t seaner. 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">herriokge, he ston&#39;s glinged sely he mught. &#34;ye,.&#34; bac it, he said just gally, you,&#34; said, &#34;is ed. the some coired. ic was tookstse,&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">and ron,&#34; said screchens: a bryaut of he stall 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 2 	Batch: 400000 - 400025 	Loss: 39.16  
+</span></span><span class="line"><span class="cl">uldeding what tears from the dooms fronlaim the one aw thr again. in he piond beate, he&#39;piled weellay&#39;s fouddout plait,&#34; lelt can&#39;t a noich arope-ficling hermoling, and hermione, the wlithing to durglevor evevingses agothere and haw and might of them 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 3 	Batch: 0 - 25 	Loss: 39.68  
+</span></span><span class="line"><span class="cl">ay, he cain!&#34; said hagrid magalay&#39;s low, and our shunds?&#34; tarng, engon&#39;t yooh was them. see -- shat.&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">it weot sift you mased was ears oworeing us i donn.&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;arwuin upcors avely from maying that one. pury. mer quted would to at the coulding tomk am 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 3 	Batch: 400000 - 400025 	Loss: 37.28  
+</span></span><span class="line"><span class="cl">ribla gry toued, we maingh the praying they out harry and simptsor streat, neacly sunding up inta tice of the ortepled at hergion grinned you just franteriogess, blioking, but want a firs-&#39;s they the coods behind hermione aw they goinging toke.. he s 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 4 	Batch: 0 - 25 	Loss: 37.92  
+</span></span><span class="line"><span class="cl">ain, askeds to grow.&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;i was a drofey strent for yelle a pupazely unyerseached the steninied, soub, we&#39;ll it, but cemsting!&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">peeze, cillod, but would suef freens gundes, forlit brood neder high quidey plyfoid me -- more..., i&#39;me gove, in the purs 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Epoch: 4 	Batch: 400000 - 400025 	Loss: 35.93  
+</span></span><span class="line"><span class="cl">wing. &#34;she --&#34; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;they dunned. &#34;there, poing&#39;s nowed him i poents cuddents wils a the trank of snare-aching was what ,&#34;drown out of the and going. how exven you a stone of his sayt aborghtaney deat who it wecenes to dight,&#34; so mach down she cleaved d 
+</span></span></code></pre></div><hr>
 <p>Although we have just trained our LSTM for a few iterations, it has learnt to correctly spell words like harry and hermione, and how to start dialogue with quotation marks.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">J</span><span class="p">))],</span> <span class="n">J</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&#34;#training iterations&#34;</span><span class="p">)</span>

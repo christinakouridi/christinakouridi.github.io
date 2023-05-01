@@ -2,7 +2,6 @@
 title: "Vanilla GAN with Numpy"
 date: 2019-07-09
 draft: false
-math: true
 ---
 
 Generative Adversarial Networks (GANs) have achieved tremendous success in generating high-quality synthetic images and efficiently internalising the essence of the images that they learn from. Their potential is enormous, as they can learn to do that for any distribution of data.
@@ -52,30 +51,37 @@ In the generator network, it is recommended to use a *ReLU* activation in the hi
 
 1. **Training $D$ to maximise the probability of assigning the correct label to the training examples**, $D(x)$ and samples from the generator, $D(G(z))$. The discriminator therefore wants to maximise:
 
-    $\begin{aligned}
+    ```katex
+    $$ \begin{aligned}
     J^{(D)} = \mathbb{E}\_{x \sim p\_{data}(x)}logD(x) + \mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z))
-    \end{aligned}$
-
+    \end{aligned} $$
+    ```
 
     where $p_{data}$ is the training data distribution and $p_{z}$ the noise prior. This is equivalent to minimising:
 
-    $\begin{aligned}
+    ```katex
+    $$ \begin{aligned}
     J^{(D)} = -\mathbb{E}\_{x \sim p\_{data}(x)}logD(x) -\mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z))
-    \end{aligned}$
+    \end{aligned} $$
+    ```
 
-    This is just the **standard cross-entropy cost that is minimised when training a binary classifier with a sigmoid output**. The only difference is that **the classifier is trained on two mini-batches of data**; one coming from the dataset, where the label is 1 for all examples, and one coming from the generator, where the label is 0 for all examples.
+This is just the **standard cross-entropy cost that is minimised when training a binary classifier with a sigmoid output**. The only difference is that **the classifier is trained on two mini-batches of data**; one coming from the dataset, where the label is 1 for all examples, and one coming from the generator, where the label is 0 for all examples.
 
 2. **Training $G$ to minimise the likelihood of the generated images not coming from the real data distribution**. In other words, $G$ is trying to maximally confuse the discriminator. It tries to minimise:
 
-    $\begin{aligned}
+    ```katex
+    $$ \begin{aligned}
     J^{(G)} = \mathbb{E}\_{z \sim p\_{z}(z)}log(1-D(G(z)))
-    \end{aligned}$
+    \end{aligned} $$
+    ```
 
     Typically, an alternative, non-saturating training criterion is used for the generator:
 
-    $\begin{aligned}
+    ```katex
+    $$ \begin{aligned}
     J^{(G)} = -\mathbb{E}\_{z \sim p\_{z}(z)}log(D(G(z))
-    \end{aligned}$
+    \end{aligned} $$
+    ```
 
 #### Implementation
 ##### Imports
@@ -102,9 +108,11 @@ As we will only use the train data, the test data (10k images) will be ignored.
 print("y_train.shape",y_train.shape)
 print("x_train.shape",x_train.shape)
 ```
+
+```
 y_train.shape (60000,)  
 x_train.shape (60000, 28, 28)
-
+```
 
 ##### Initialisation
 We will wrap all functions in the GAN class.
@@ -205,6 +213,7 @@ def preprocess_data(self, x, y):
 
 GAN.preprocess_data = preprocess_data
 ```
+
 ##### Activation Functions
 Here, we will implement the activation functions that will be used in forward propagation. Numpy’s tanh is used directly. The leaky ReLU function (lrelu) effectively acts as the relu function when the alpha parameter is set to zero.
 

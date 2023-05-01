@@ -47,6 +47,22 @@
     
 
     <meta name="generator" content="Hugo 0.111.3">
+
+    <style>
+      .equation {
+        border-radius: .3rem;
+        margin: 2rem 0;
+        overflow-x:auto;
+        padding: 1rem 1rem;
+      }
+      .katex-display > .katex {
+        text-align: left !important;
+      }
+    </style>
+  
+    
+    
+
   </head>
 
   <body class="">
@@ -188,51 +204,56 @@
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;even&#39;</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">bad_example</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-</span></span></code></pre></div><p>0    2<br>
-1    1<br>
-Name: even, dtype: int64</p>
-<p>Although with <em>@jit</em> the code runs successfully, <em>@njit</em> raises an error.</p>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">0    2  
+</span></span><span class="line"><span class="cl">1    1  
+</span></span><span class="line"><span class="cl">Name: even, dtype: int64
+</span></span></code></pre></div><p>Although with <em>@jit</em> the code runs successfully, <em>@njit</em> raises an error.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@njit</span>
 </span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">bad_example</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;even&#39;</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">bad_example</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-</span></span></code></pre></div><p>TypingError                               Traceback (most recent call last)
-<!-- raw HTML omitted --> in <!-- raw HTML omitted -->()
-3     return x[&rsquo;even&rsquo;]
-4
-&mdash;-&gt; 5 bad_example(df)
-6
-7 bad_example(df)</p>
-<p>~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in _compile_for_args(self, *args, **kws)
-399                 e.patch_message(msg)
-400
-&ndash;&gt; 401             error_rewrite(e, &rsquo;typing&rsquo;)
-402         except errors.UnsupportedError as e:
-403             # Something unsupported is present in the user code, add help info</p>
-<p>~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in error_rewrite(e, issue_type)
-342                 raise e
-343             else:
-&ndash;&gt; 344                 reraise(type(e), e, None)
-345
-346         argtypes = []</p>
-<p>~/anaconda3/lib/python3.6/site-packages/numba/six.py in reraise(tp, value, tb)
-666             value = tp()
-667         if value.<strong>traceback</strong> is not tb:
-&ndash;&gt; 668             raise value.with_traceback(tb)
-669         raise value
-670</p>
-<p>TypingError: Failed in nopython mode pipeline (step: nopython frontend)
-non-precise type pyobject
-[1] During: typing of argument at <!-- raw HTML omitted --> (3)</p>
-<p>File &ldquo;<!-- raw HTML omitted -->&rdquo;, line 3:
-def bad_example(x):
-return x[&rsquo;even&rsquo;]
-^</p>
-<p>This error may have been caused by the following argument(s):<br>
--argument 0: cannot determine Numba type of &lt;class &lsquo;pandas.core.frame.DataFrame&rsquo;&gt;</p>
-<hr>
-<p>Usually this is not a problem with Numba itself but instead <strong>often caused by the use of unsupported features or an issue in resolving types</strong>. Python/ NumPy features supported by the latest release can be found <a href="http://numba.pydata.org/numba-doc/latest/reference/pysupported.html">here</a> and <a href="http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html">here</a>. More information on typing errors and how to debug them can be found <a href="http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-doesn-t-compile">here</a>.</p>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">TypingError                               Traceback (most recent call last)
+</span></span><span class="line"><span class="cl">&lt;ipython-input-12-63299406f3ac&gt; in &lt;module&gt;()
+</span></span><span class="line"><span class="cl">    3     return x[&#39;even&#39;]
+</span></span><span class="line"><span class="cl">    4 
+</span></span><span class="line"><span class="cl">----&gt; 5 bad_example(df)
+</span></span><span class="line"><span class="cl">    6 
+</span></span><span class="line"><span class="cl">    7 bad_example(df)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in _compile_for_args(self, *args, **kws)
+</span></span><span class="line"><span class="cl">    399                 e.patch_message(msg)
+</span></span><span class="line"><span class="cl">    400 
+</span></span><span class="line"><span class="cl">--&gt; 401             error_rewrite(e, &#39;typing&#39;)
+</span></span><span class="line"><span class="cl">    402         except errors.UnsupportedError as e:
+</span></span><span class="line"><span class="cl">    403             # Something unsupported is present in the user code, add help info
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">~/anaconda3/lib/python3.6/site-packages/numba/dispatcher.py in error_rewrite(e, issue_type)
+</span></span><span class="line"><span class="cl">    342                 raise e
+</span></span><span class="line"><span class="cl">    343             else:
+</span></span><span class="line"><span class="cl">--&gt; 344                 reraise(type(e), e, None)
+</span></span><span class="line"><span class="cl">    345 
+</span></span><span class="line"><span class="cl">    346         argtypes = []
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">~/anaconda3/lib/python3.6/site-packages/numba/six.py in reraise(tp, value, tb)
+</span></span><span class="line"><span class="cl">    666             value = tp()
+</span></span><span class="line"><span class="cl">    667         if value.__traceback__ is not tb:
+</span></span><span class="line"><span class="cl">--&gt; 668             raise value.with_traceback(tb)
+</span></span><span class="line"><span class="cl">    669         raise value
+</span></span><span class="line"><span class="cl">    670 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">TypingError: Failed in nopython mode pipeline (step: nopython frontend)
+</span></span><span class="line"><span class="cl">non-precise type pyobject
+</span></span><span class="line"><span class="cl">[1] During: typing of argument at &lt;ipython-input-12-63299406f3ac&gt; (3)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">File &#34;&lt;ipython-input-12-63299406f3ac&gt;&#34;, line 3:
+</span></span><span class="line"><span class="cl">def bad_example(x):
+</span></span><span class="line"><span class="cl">    return x[&#39;even&#39;]
+</span></span><span class="line"><span class="cl">    ^
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">This error may have been caused by the following argument(s):  
+</span></span><span class="line"><span class="cl">-argument 0: cannot determine Numba type of &lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+</span></span></code></pre></div><p>Usually this is not a problem with Numba itself but instead <strong>often caused by the use of unsupported features or an issue in resolving types</strong>. Python/ NumPy features supported by the latest release can be found <a href="http://numba.pydata.org/numba-doc/latest/reference/pysupported.html">here</a> and <a href="http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html">here</a>. More information on typing errors and how to debug them can be found <a href="http://numba.pydata.org/numba-doc/latest/user/troubleshoot.html#my-code-doesn-t-compile">here</a>.</p>
 <p>Numba is under active development with lots of exciting functionality in store (e.g. class wrappers). To help its development, consider reporting any new issues at <a href="https://github.com/numba/numba/issues/new">Numba&rsquo;s GitHub repo</a>.</p>
 </li>
 </ul>
